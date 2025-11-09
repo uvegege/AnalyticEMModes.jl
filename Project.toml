@@ -1,0 +1,7 @@
+name = "AnalyticEMModes"
+version = "0.1.0"
+uuid = "06082180-01c6-4111-bddd-8ca6f05e518a"
+
+[deps]
+Bessels = "0e736298-9ec6-45e8-9647-e4fc86a2fe38"
+MathieuF = "1d5ea620-0e37-47ee-af2a-0a7cf7ec3863"
