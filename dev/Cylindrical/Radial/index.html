@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Radial &amp; Wedge · AnalyticEMModes.jl</title><meta name="title" content="Radial &amp; Wedge · AnalyticEMModes.jl"/><meta property="og:title" content="Radial &amp; Wedge · AnalyticEMModes.jl"/><meta property="twitter:title" content="Radial &amp; Wedge · AnalyticEMModes.jl"/><meta name="description" content="Documentation for AnalyticEMModes.jl."/><meta property="og:description" content="Documentation for AnalyticEMModes.jl."/><meta property="twitter:description" content="Documentation for AnalyticEMModes.jl."/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../Introduction/">AnalyticEMModes.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../Introduction/">Home</a></li><li><a class="tocitem" href="../../Usage/">Usage</a></li><li><span class="tocitem">Examples</span><ul><li><a class="tocitem" href="../../Examples/">Gallery</a></li><li><a class="tocitem" href="../../Rectangular/rectangular/">Rectangular</a></li><li><input class="collapse-toggle" id="menuitem-3-3" type="checkbox" checked/><label class="tocitem" for="menuitem-3-3"><span class="docs-label">Cylindrical</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../Circular/">Circular Waveguides</a></li><li><a class="tocitem" href="../Coaxial/">Coaxial Waveguides</a></li><li class="is-active"><a class="tocitem" href>Radial &amp; Wedge</a><ul class="internal"><li><a class="tocitem" href="#TE-Modes"><span>TE Modes</span></a></li><li><a class="tocitem" href="#TM-Modes"><span>TM Modes</span></a></li><li class="toplevel"><a class="tocitem" href="#Wedge-Waveguide"><span>Wedge Waveguide</span></a></li></ul></li></ul></li><li><a class="tocitem" href="../../Elliptic/elliptic/">Elliptic</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Examples</a></li><li><a class="is-disabled">Cylindrical</a></li><li class="is-active"><a href>Radial &amp; Wedge</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Radial &amp; Wedge</a></li></ul></nav><div class="docs-right"><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Radial-Waveguide"><a class="docs-heading-anchor" href="#Radial-Waveguide">Radial Waveguide</a><a id="Radial-Waveguide-1"></a><a class="docs-heading-anchor-permalink" href="#Radial-Waveguide" title="Permalink"></a></h1><p>Radial waveguides are structures that support radial wave propagation between parallel conducting plates. Unlike conventional waveguides where propagation is along the z-axis, radial guides exhibit wave propagation in the radial direction (ρ-direction). The field solutions involve Hankel functions of the radial coordinate, combined with sinusoidal variations in the azimuthal (φ) and vertical (z) directions.</p><p>Common examples include parallel-plate disk structures and sector-shaped geometries. For detailed mathematical derivations, see the Theory section.</p><h2 id="TE-Modes"><a class="docs-heading-anchor" href="#TE-Modes">TE Modes</a><a id="TE-Modes-1"></a><a class="docs-heading-anchor-permalink" href="#TE-Modes" title="Permalink"></a></h2><p>The following visualization shows the Hρ field for the first 12 TE modes, rendered on a 3D cylindrical sector:</p><pre><code class="language-julia hljs">H = 1
+R = 1
+
+name = &quot;../Assets/mesh/radial_wg1.msh&quot;
+#radialwg_mesh(H, R; dl = 0.4e-1, name = name)
+
+coord, conn, _ = mesh_data_radial(name)
+coords = coord[:, 1:maximum(conn)]
+xcoords = coords[1, :]
+ycoords = coords[2, :]
+zcoords = coords[3, :]
+rcoords = map((x, y) -&gt; hypot(x, y), xcoords, ycoords)
+ϕcoords = map((x, y) -&gt; atan(y, x), xcoords, ycoords)
+
+modekind = [(0, 1), (1, 1), (2, 1), (3, 1), (0, 2), (1, 2),
+            (2, 2), (3, 2), (0, 3), (1, 3), (2, 3), (3, 3)]
+
+plot_ids = Iterators.product(1:4, 1:3) |&gt; collect |&gt; vec
+
+fig = Figure(size = (1200, 900))
+for (idplot, (m, n)) in enumerate(modekind)
+    stitle = L&quot;TE_{%$m%$n}&quot;
+    ii, jj = plot_ids[idplot]
+    axi = Axis3(fig[jj,ii], title = stitle, titlesize = 20)
+    hidedecorations!(axi)
+    fields = te_radial_fields(rcoords, ϕcoords, zcoords, H, m, n, 0.0, 1.0, 100e9, 1, 1)
+    fz = getindex.(fields, 4)
+    mesh!(axi, coords, conn, color = abs.(fz), colormap = :jet, interpolate = false)
+end
+fig</code></pre><img src="6d99e063.png" alt="Example block output"/><p>The mode indices (m, n) determine the number of azimuthal and vertical variations, respectively. Notice how modes with m = 0 are axisymmetric, while modes with m &gt; 0 exhibit azimuthal nodal planes.</p><h2 id="TM-Modes"><a class="docs-heading-anchor" href="#TM-Modes">TM Modes</a><a id="TM-Modes-1"></a><a class="docs-heading-anchor-permalink" href="#TM-Modes" title="Permalink"></a></h2><p>The following shows the Eρ field patterns for the first 12 TM modes:</p><pre><code class="language-julia hljs">fig = Figure(size = (1200, 900))
+
+modekind = [(0, 1), (1, 1), (2, 1), (3, 1),
+            (0, 2), (1, 2), (2, 2), (3, 2),
+            (0, 3), (1, 3), (2, 3), (3, 3)]
+
+plot_ids = Iterators.product(1:4, 1:3) |&gt; collect |&gt; vec
+for (idplot, (m, n)) in enumerate(modekind)
+    stitle = L&quot;TM_{%$m%$n}&quot;
+    ii, jj = plot_ids[idplot]
+    axi = Axis3(fig[jj,ii], title = stitle, titlesize = 20)
+    hidedecorations!(axi)
+    fields = tm_radial_fields(rcoords, ϕcoords, zcoords, H, m, n, 0.0, 1.0, 100e9, 1, 1)
+    fz = getindex.(fields, 1)
+    mesh!(axi, coords, conn, color = abs.(fz), colormap = :jet, interpolate = false)
+end
+fig</code></pre><img src="201854a8.png" alt="Example block output"/><p>TM modes satisfy boundary conditions where Eρ = 0 at the top and bottom conducting plates (at z = 0 and z = H).</p><h1 id="Wedge-Waveguide"><a class="docs-heading-anchor" href="#Wedge-Waveguide">Wedge Waveguide</a><a id="Wedge-Waveguide-1"></a><a class="docs-heading-anchor-permalink" href="#Wedge-Waveguide" title="Permalink"></a></h1><p>Wedge waveguides are angular sectors bounded by two radial conducting walls at angles φ = 0 and φ = φ₀, along with top and bottom parallel plates. These structures support modes with quantized azimuthal variations determined by the wedge angle. The mode parameter m must satisfy m = nπ/φ₀ where n is an integer, ensuring proper boundary conditions at the angular walls.</p><p>The following visualization shows the Hz field (longitudinal magnetic component) for the first 12 TE modes in a wedge with angle φ₀ = π/3 (60 degrees):</p><pre><code class="language-julia hljs">H = 1
+R = 1
+
+name = &quot;../Assets/mesh/wedge_wg1.msh&quot;
+
+ϕ0 = pi/3
+#wedgewg_mesh(H, R, ϕ0; dl = 0.3e-1, name = name)
+coord, conn, connf = mesh_data_radial(name)
+c_ids = unique(conn)
+coords = coord[:, c_ids]
+D = Dict(c_ids .=&gt; eachindex(c_ids))
+new_conn = map(x-&gt;D[x], conn)
+xcoords = coords[1, :]
+ycoords = coords[2, :]
+zcoords = coords[3, :]
+rcoords = map((x, y) -&gt; hypot(x, y), xcoords, ycoords)
+ϕcoords = map((x, y) -&gt; atan(y, x), xcoords, ycoords)
+
+
+modekind = [(0, 1), (1, 1), (2, 1), (3, 1),
+            (0, 2), (1, 2), (2, 2), (3, 2),
+            (0, 3), (1, 3), (2, 3), (3, 3)]
+
+plot_ids = Iterators.product(1:4, 1:3) |&gt; collect |&gt; vec
+
+fig = Figure(size = (1200, 900))
+for (idplot, (m, n)) in enumerate(modekind)
+    stitle = L&quot;TE_{%$m%$n}&quot;
+    ii, jj = plot_ids[idplot]
+    axi = Axis3(fig[jj,ii], title = stitle, titlesize = 20, azimuth = pi/5)
+    hidedecorations!(axi)
+    fields = te_wedge_fields(rcoords, ϕcoords, zcoords, H, ϕ0, m, n, 1.0, 0.0, 100e9, 1, 1)
+    fz = getindex.(fields, 6)
+    m1 = mesh!(axi, coord, connf, color = :gray)
+    m2 = mesh!(axi, coords, new_conn, color = abs.(fz), colormap = :jet)
+end
+fig</code></pre><img src="24f90ad5.png" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../Coaxial/">« Coaxial Waveguides</a><a class="docs-footer-nextpage" href="../../Elliptic/elliptic/">Elliptic »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.15.0 on <span class="colophon-date" title="Monday 10 November 2025 19:14">Monday 10 November 2025</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
