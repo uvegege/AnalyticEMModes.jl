@@ -4,16 +4,9 @@ using AnalyticEMModes
 # Configurar DocMeta para el módulo
 DocMeta.setdocmeta!(AnalyticEMModes, :DocTestSetup, :(using AnalyticEMModes); recursive=true)
 
-makedocs(
-    clean = true,
-    format = Documenter.HTML(;
-        prettyurls = get(ENV, "CI", nothing) == "true",
-        canonical = "https://uvegege.github.io/AnalyticEMModes.jl",
-        assets = String[],
-        size_threshold = 100_000_000
-    ),
+makedocs(modules = [AnalyticEMModes],
+    format = Documenter.HTML(; size_threshold=100_000_000),
     sitename = "AnalyticEMModes.jl",
-    authors = "",
     pages = Any[
         "Home" => "Introduction.md",
         "Overview" => "Overview.md",

@@ -5,3 +5,15 @@ uuid = "4347a9b3-a74f-4459-95f9-6cf3b5a9075d"
 [deps]
 Bessels = "0e736298-9ec6-45e8-9647-e4fc86a2fe38"
 MathieuF = "1d5ea620-0e37-47ee-af2a-0a7cf7ec3863"
+
+[compat]
+Bessels = "0.2.8"
+MathieuF = "0.1.5"
+julia = "1.10"
+
+[extras]
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test", "Documenter"]
