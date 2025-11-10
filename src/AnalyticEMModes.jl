@@ -3,6 +3,27 @@ module AnalyticEMModes
     using Bessels
     using MathieuF
 
+    include("./common.jl")
+    
+    # Rectangular Coordinates
+    include("./rectangularwg.jl") # Rectangular Waveguide
+
+    # Cylindrical Coordinates:
+    include("./circularwg.jl") # Circular Waveguide
+    include("./coaxialwg.jl") # Coaxial Waveguide
+    include("./radialwg.jl") # Radial Waveguide
+    include("./wedgewg.jl") # Wedge Waveguide
+
+    # Elliptic Coordinates
+    include("./ellipticalwg.jl") 
+    
+    # Spherical Coordinates
+    #include("./Spherical.jl") # TODO
+
+    # Sort modes
+    include("./sortmodes.jl")
+
+
     export wavenumber, phase_constant, attenuation_factor, propagation_constant
     export cutoff_frequency, mode_wavelength, mode_impedance
     
@@ -23,26 +44,6 @@ module AnalyticEMModes
     export cart2elliptic, metric_and_unit_elliptic, ce_m, se_m, Ce_m, Se_m
     
     export first_n_modes_rwg, first_n_modes_cwg, first_n_modes_coax, first_n_modes_radial, first_n_modes_ewg
-
-    include("./common.jl")
-    
-    # Rectangular Coordinates
-    include("./rectangularwg.jl") # Rectangular Waveguide
-
-    # Cylindrical Coordinates:
-    include("./circularwg.jl") # Circular Waveguide
-    include("./coaxialwg.jl") # Coaxial Waveguide
-    include("./radialwg.jl") # Radial Waveguide
-    include("./wedgewg.jl") # Wedge Waveguide
-
-    # Elliptic Coordinates
-    include("./ellipticalwg.jl") 
-    
-    # Spherical Coordinates
-    #include("./Spherical.jl") # TODO
-
-    # Sort modes
-    include("./sortmodes.jl")
 
 end
 

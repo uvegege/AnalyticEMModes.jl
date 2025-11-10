@@ -1,5 +1,5 @@
 [deps]
-AnalyticEMModes.jl = "4347a9b3-a74f-4459-95f9-6cf3b5a9075d"
+AnalyticEMModes = "4347a9b3-a74f-4459-95f9-6cf3b5a9075d"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
 Gmsh = "705231aa-382f-11e9-3f0c-b7cb4346fdeb"
