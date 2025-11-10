@@ -1,5 +1,5 @@
 using Bessels
-using LinearAlgebra
+#using LinearAlgebra
 
 # n = 1:5, m = 0:11
 const _x¹mn = collect([3.8318 1.8412 3.0542 4.2012 5.3175 6.4155 7.5013 8.5777 9.6474 10.7114 11.7708 12.8264;
