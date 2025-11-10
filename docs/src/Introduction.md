@@ -94,7 +94,7 @@ This documentation is organized as follows:
 
 ### User Guide
 - **[Usage](Usage.md)**: Detailed function reference and conventions
-- **[Examples](Ejemplos.md)**: Gallery of mode visualizations and comparisons
+- **[Examples](Examples.md)**: Gallery of mode visualizations and comparisons
 
 ### Examples by Geometry
 - **[Circular Waveguides](Cylindrical/Circular.md)**: TE and TM modes in circular guides
@@ -109,7 +109,7 @@ For users interested in the mathematical foundations:
 - Potential formulations (Hertzian potentials)
 - Boundary value problems and separation of variables
 - Special functions (Bessel, Mathieu)
-- References to classic textbooks (Balanis, Collin, Pozar, McLachlan)
+- References to classic textbooks
 
 ## API Conventions
 
