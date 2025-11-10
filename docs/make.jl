@@ -6,10 +6,11 @@ DocMeta.setdocmeta!(AnalyticEMModes, :DocTestSetup, :(using AnalyticEMModes); re
 
 makedocs(modules = [AnalyticEMModes],
     format = Documenter.HTML(; size_threshold=100_000_000),
+    clean = true,
     sitename = "AnalyticEMModes.jl",
     pages = Any[
-        "Home" => "Introduction.md",
-        "Usage" => "Usage.md",
+        "Introduction.md",
+        "Usage.md",
         "Examples" => Any[
             "Gallery" => "Examples.md",
             "Rectangular" => "Rectangular/rectangular.md",
