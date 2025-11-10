@@ -165,13 +165,6 @@ Eρ, Eφ, Ez, Hρ, Hφ, Hz = te_wedge_fields(ρ, φ, z, H, φ0, p, n, kρ, ρ0, 
 Eρ, Eφ, Ez, Hρ, Hφ, Hz = tm_wedge_fields(ρ, φ, z, H, φ0, p, n, kρ, ρ0, f, μᵣ, εᵣ)
 ```
 
-## Common Parameters
-
-All field functions share these common parameters:
-
-- **`f`:** Operating frequency in Hz
-- **`μᵣ`:** Relative permeability of the medium (typically 1.0 for air)
-- **`εᵣ`:** Relative permittivity of the medium (typically 1.0 for air)
 
 ## Return Values
 
@@ -229,35 +222,6 @@ for (mode_type, m, n, kc) in modes
 end
 ```
 
-## Typical Workflow
-
-### Define Geometry and Mode
-
-```julia
-using AnalyticEMModes
-
-# Example: TE₁₁ mode in circular waveguide
-R = 0.01          # 1 cm radius
-m, n = 1, 1       # TE₁₁ mode
-f = 20e9          # 20 GHz
-μᵣ, εᵣ = 1.0, 1.0 # Air
-```
-
-### Check Cutoff Condition
-
-```julia
-kc = kc_cwg(R, m, n, :TE)
-fc = cutoff_frequency(kc, μᵣ, εᵣ)
-
-println("Cutoff frequency: $(fc/1e9) GHz")
-
-if f > fc
-    println("Mode propagates")
-else
-    println("Mode is evanescent")
-end
-```
-
 ### Evaluate Fields
 
 ```julia
@@ -270,7 +234,6 @@ r_vec = range(0, R, length=100)
 θ_vec = fill(π/4, 100)
 fields = te_cwg_fields(r_vec, θ_vec, R, m, n, f, μᵣ, εᵣ)
 ```
-
 
 ## Examples
 

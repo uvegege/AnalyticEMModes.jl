@@ -9,15 +9,15 @@ makedocs(modules = [AnalyticEMModes],
     sitename = "AnalyticEMModes.jl",
     pages = Any[
         "Home" => "Introduction.md",
-        "Overview" => "Overview.md",
+        "Usage" => "Usage.md",
         "Examples" => Any[
-            "Gallery" => "Ejemplos.md",
+            "Gallery" => "Examples.md",
+            "Rectangular" => "Rectangular/rectangular.md",
             "Cylindrical" => Any[
                 "Circular Waveguides" => "Cylindrical/Circular.md",
                 "Coaxial Waveguides" => "Cylindrical/Coaxial.md",
                 "Radial & Wedge" => "Cylindrical/Radial.md"
             ],
-            "Rectangular" => "Rectangular/rectangular.md",
             "Elliptic" => "Elliptic/elliptic.md"
         ]
     ],

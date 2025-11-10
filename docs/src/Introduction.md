@@ -148,7 +148,7 @@ Contributions are welcome! Areas for expansion:
 
 This package builds upon:
 - `Bessels.jl` for Bessel function evaluation
-- Classic waveguide theory from Balanis, Collin, Pozar, etc.
+- Classic EM and waveguide books.
 
 ## Support
 
