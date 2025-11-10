@@ -1,3 +1,4 @@
+#=
 Pkg.add("SciPy")
 using SciPy
 
@@ -164,3 +165,5 @@ qs = range(0.1, 450.0, 3000)
 ξi = 0.6931471805599453
 y_ju = getindex.(Ce_m.(1, qs, ξi),1)
 lines!(ax1, qs, y_ju)
+
+=#

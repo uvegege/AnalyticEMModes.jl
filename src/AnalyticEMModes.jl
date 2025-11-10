@@ -46,5 +46,3 @@ module AnalyticEMModes
 
 end
 
-1
-
