@@ -1,6 +1,6 @@
-name = "AnalyticEMModes"
+name = "AnalyticEMModes.jl"
 version = "0.1.0"
-uuid = "06082180-01c6-4111-bddd-8ca6f05e518a"
+uuid = ""4347a9b3-a74f-4459-95f9-6cf3b5a9075d""
 
 [deps]
 Bessels = "0e736298-9ec6-45e8-9647-e4fc86a2fe38"

@@ -1,27 +1,8 @@
-#cd("C:\\MisProyecto\\Upload\\AnalyticEMModes\\docs")
-#using Pkg
-#Pkg.activate(;temp = true)
-#Pkg.add("Gmsh")
-#Pkg.add("Gridap")
-#Pkg.add("Arpack")
-#Pkg.add("GridapGmsh")
 
-#using Gridap
-#using GridapGmsh
-#
-#using Gridap.Helpers
-#using Gridap.Arrays
-#using Gridap.CellData
-#using Gridap.Geometry
-#using Gridap.ReferenceFEs
-#using Gridap.Visualization
-#
-#using Arpack
 using Gmsh
 using Gmsh: gmsh
 using GLMakie
-include(raw"C:\MisProyecto\Upload\AnalyticEMModes\src\AnalyticEMModes.jl")
-#using .AnalyticEMModes
+using AnalyticEMModes
 
 include(joinpath(@__DIR__, "example_mesh.jl"))
 

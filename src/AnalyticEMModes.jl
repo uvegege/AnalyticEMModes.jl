@@ -1,9 +1,3 @@
-
-#using Pkg
-#cd("C:\\MisProyecto\\Upload/AnalyticEMModes.jl//")
-#Pkg.activate(".")
-
-
 module AnalyticEMModes
 
     using Bessels
@@ -52,5 +46,5 @@ module AnalyticEMModes
 
 end
 
-using .AnalyticEMModes
+1
 
