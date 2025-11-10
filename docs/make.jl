@@ -22,8 +22,7 @@ makedocs(modules = [AnalyticEMModes],
         ]
     ],
     doctest = false,
-    checkdocs = :none,
-    remotes = nothing
+    checkdocs = :none
 )
 
 deploydocs(
