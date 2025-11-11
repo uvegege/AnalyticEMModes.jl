@@ -9,7 +9,7 @@ makedocs(modules = [AnalyticEMModes],
     clean = true,
     sitename = "AnalyticEMModes.jl",
     pages = Any[
-        "Introduction.md",
+        "index.md",
         "Usage.md",
         "Examples" => Any[
             "Gallery" => "Examples.md",
