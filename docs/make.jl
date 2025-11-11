@@ -11,6 +11,7 @@ makedocs(modules = [AnalyticEMModes],
     pages = Any[
         "index.md",
         "Usage.md",
+        "api_reference.md",
         "Examples" => Any[
             "Gallery" => "Examples.md",
             "Rectangular" => "Rectangular/rectangular.md",
@@ -20,7 +21,13 @@ makedocs(modules = [AnalyticEMModes],
                 "Radial & Wedge" => "Cylindrical/Radial.md"
             ],
             "Elliptic" => "Elliptic/elliptic.md"
-        ]
+        ],
+        "Theory" => Any[
+            "Introduction" => "theory/introduction.md",
+            "Coordinate Systems" => "theory/coordinate.md",
+            "Mode Theory" => "theory/em_solutions.md",
+            "Rectangular" => "theory/theory_rectangular.md"
+            ]
     ],
     doctest = false,
     checkdocs = :none
