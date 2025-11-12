@@ -10,7 +10,7 @@ include("../Assets/docs_include.jl")
 
 Radial waveguides are structures that support radial wave propagation between parallel conducting plates. Unlike conventional waveguides where propagation is along the z-axis, radial guides exhibit wave propagation in the radial direction (ρ-direction). The field solutions involve Hankel functions of the radial coordinate, combined with sinusoidal variations in the azimuthal (φ) and vertical (z) directions.
 
-Common examples include parallel-plate disk structures and sector-shaped geometries. For detailed mathematical derivations, see the Theory section.
+Common examples include parallel-plate disk structures and sector-shaped geometries.
 
 ## TE Modes
 

@@ -96,20 +96,19 @@ P = \frac{1}{2} \, \text{Re} \int_S (\mathbf{E} \times \mathbf{H}^*) \cdot \hat{
 ```
 
 In propagating modes, $P$ is positive and represents transmitted energy.  
-In evanescent modes, $P = 0$: the fields store energy locally but do not transport it.
-
+In evanescent modes, ($P = 0$): the fields store energy locally but do not transport it.
 
 ## 6. Orthogonality and Normalization
 
 Modal fields satisfy an orthogonality condition that makes them particulary useful in analytical and numerical analysis:
 
 ```math
-$$\int_S (\mathbf{E}_m \times \mathbf{H}_n^*) \cdot \hat{\mathbf{n}}\, d\mathbf{S} = 0 \quad \text{for} \quad m \neq n$$```
+\int_S (\mathbf{E}_m \times \mathbf{H}_n^*) \cdot \hat{\mathbf{n}}\, d\mathbf{S} = 0 \quad \text{for} \quad m \neq n```
 
 This means each mode can propagate independently, and total fields can be expanded as a linear combination of modes:
 
 ```math
-$$\mathbf{E} = \sum_m a_m \mathbf{E}_m, \quad \mathbf{H} = \sum_m a_m \mathbf{H}_m$$
+\mathbf{E} = \sum_m a_m \mathbf{E}_m, \quad \mathbf{H} = \sum_m a_m \mathbf{H}_m
 ```
 
 ## References

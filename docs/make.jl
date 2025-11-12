@@ -26,7 +26,7 @@ makedocs(modules = [AnalyticEMModes],
             "Introduction" => "theory/introduction.md",
             "Coordinate Systems" => "theory/coordinate.md",
             "Mode Theory" => "theory/em_solutions.md",
-            "Rectangular" => "theory/theory_rectangular.md"
+            "Power Normalization" => "theory/power_normalization.md"
             ]
     ],
     doctest = false,

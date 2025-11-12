@@ -72,3 +72,18 @@ H_r = -\frac{\gamma}{j\omega\mu\epsilon} \frac{\partial F_z}{\partial r}, \quad
 H_\theta = -\frac{\gamma}{j\omega\mu\epsilon} \frac{1}{r} \frac{\partial F_z}{\partial \theta}, \quad
 H_z = \frac{k_c^2}{j\omega\mu\epsilon} F_z
 ```
+
+# Power normalization
+
+For a TE mode the fields are:
+
+```@math 
+E_\rho = \frac{}{}
+
+## Normalization Circular Waveguide
+
+## Normalization Coaxial Waveguide
+
+## Normalization Radial Waveguide (Parallel Plates)
+
+## Normalization Wedge Waveguide

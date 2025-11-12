@@ -140,12 +140,11 @@ modes = first_n_modes_ewg(N, a, b)
 - `H`: Height between parallel plates (m)
 - `m`: Azimuthal mode number
 - `n`: Vertical mode number
-- `ρ0`: Reference radial position
 
 **Functions:**
 ```julia
-Eρ, Eφ, Ez, Hρ, Hφ, Hz = te_radial_fields(ρ, φ, z, H, m, n, ρ0, kρ, f, μᵣ, εᵣ)
-Eρ, Eφ, Ez, Hρ, Hφ, Hz = tm_radial_fields(ρ, φ, z, H, m, n, ρ0, kρ, f, μᵣ, εᵣ)
+Eρ, Eφ, Ez, Hρ, Hφ, Hz = te_radial_fields(r, ϕ, z, H, m, n, Amn, Bmn, f,  μᵣ, εᵣ )
+Eρ, Eφ, Ez, Hρ, Hφ, Hz = tm_radial_fields(r, ϕ, z, H, m, n, Amn, Bmn, f,  μᵣ, εᵣ )
 ```
 
 ### Wedge Waveguides (`wedge`)
@@ -161,8 +160,8 @@ Eρ, Eφ, Ez, Hρ, Hφ, Hz = tm_radial_fields(ρ, φ, z, H, m, n, ρ0, kρ, f, �
 
 **Functions:**
 ```julia
-Eρ, Eφ, Ez, Hρ, Hφ, Hz = te_wedge_fields(ρ, φ, z, H, φ0, p, n, kρ, ρ0, f, μᵣ, εᵣ)
-Eρ, Eφ, Ez, Hρ, Hφ, Hz = tm_wedge_fields(ρ, φ, z, H, φ0, p, n, kρ, ρ0, f, μᵣ, εᵣ)
+Eρ, Eφ, Ez, Hρ, Hφ, Hz = te_wedge_fields(r, ϕ, z, h, ϕ0, p, n, Amn, Bmn, f, μᵣ, εᵣ)
+Eρ, Eφ, Ez, Hρ, Hφ, Hz = tm_wedge_fields(r, ϕ, z, h, ϕ0, p, n, Amn, Bmn, f, μᵣ, εᵣ)
 ```
 
 

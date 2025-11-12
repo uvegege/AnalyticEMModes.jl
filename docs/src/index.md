@@ -106,10 +106,8 @@ This documentation is organized as follows:
 ### Theory (Recommended Reading)
 For users interested in the mathematical foundations:
 - Coordinate systems and transformations
-- Potential formulations (Hertzian potentials)
-- Boundary value problems and separation of variables
-- Special functions (Bessel, Mathieu)
-- References to classic textbooks
+- Power normalization 
+- [WIP] Potential formulations (Hertzian potentials)  , Boundary value problems and separation of variables  , Special functions (Bessel, Mathieu) , References to classic textbooks 
 
 ## API Conventions
 

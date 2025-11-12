@@ -201,6 +201,6 @@ F_0 = \sqrt{\frac{8k_c^4}{\beta \omega \varepsilon \pi^2 \left( \delta_m n^2 \fr
 
 ## References
 
-Harrington, R. F. (1961). *Time-Harmonic Electromagnetic Fields*, Chapter 3.  
-Stratton, J. A. (1941). *Electromagnetic Theory*, Chapter 5.  
-Balanis, C. A. (2012). *Advanced Engineering Electromagnetics*, Chapter 8.
+* Harrington, R. F. (1961). *Time-Harmonic Electromagnetic Fields*, Chapter 3.  
+* Stratton, J. A. (1941). *Electromagnetic Theory*, Chapter 5.  
+* Balanis, C. A. (2012). *Advanced Engineering Electromagnetics*, Chapter 8.
