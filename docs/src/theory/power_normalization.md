@@ -86,7 +86,7 @@ Let's define the potential function as
 with derivative
 
 ```math
-\frac{\partial\psi}{\partial \rho} = \psi'(\rho) = k_c \left( A_m J_m'(k_c\rho) + B_m Y_m'(k_c\rho) \right)
+\frac{\partial\psi}{\partial \rho} = \psi^{\prime}(\rho) = k_c \left( A_m J_m'(k_c\rho) + B_m Y_m'(k_c\rho) \right)
 ```
 
 For **TM modes**, the longitudinal electric field is:
@@ -98,11 +98,11 @@ H_z = \psi(\rho) \cos(m\theta)
 The transverse field components are:
 
 ```math
-E_\rho = -\frac{j\beta}{k_c^2} \psi'(\rho) \cos(m\theta), \quad  E_\theta = \frac{j\beta}{k_c^2} \frac{m}{\rho} \psi(\rho) \sin(m\theta)
+E_\rho = -\frac{j\beta}{k_c^2} \psi^{\prime}(\rho) \cos(m\theta), \quad  E_\theta = \frac{j\beta}{k_c^2} \frac{m}{\rho} \psi(\rho) \sin(m\theta)
 ```
 
 ```math
-H_\rho = -\frac{j\omega\varepsilon}{k_c^2} \frac{m}{\rho} \psi(\rho) \sin(m\theta), \quad H_\theta = -\frac{j\omega\varepsilon}{k_c^2} \psi'(\rho) \cos(m\theta)
+H_\rho = -\frac{j\omega\varepsilon}{k_c^2} \frac{m}{\rho} \psi(\rho) \sin(m\theta), \quad H_\theta = -\frac{j\omega\varepsilon}{k_c^2} \psi^{\prime}(\rho) \cos(m\theta)
 ```
 
 ### Power Flow 
@@ -149,7 +149,7 @@ P = \frac{1}{2} \frac{\beta\omega\varepsilon}{k_c^4} \cdot \pi \cdot I
 where 
 
 ```math
-I = \int_b^a \left[ (\psi')^2 + \frac{m^2}{\rho^2} \psi^2 \right] \rho \, d\rho
+I = \int_b^a \left[ (\psi^{\prime})^2 + \frac{m^2}{\rho^2} \psi^2 \right] \rho \, d\rho
 ```
 
 ### Simplifying the Radial Integral
@@ -161,41 +161,41 @@ F = \psi
 ```
 
 ```math
-$$ \frac{\partial}{\partial\rho}\left( \rho F F^\prime  \right) = FF^\prime + \rho F^\prime F^\prime + \rho F F^" = FF^\prime + \rho \left(F^\prime\right)^2+ \rho F F^"$$
+\frac{\partial}{\partial\rho}\left( \rho F F^\prime  \right) = FF^\prime + \rho F^\prime F^\prime + \rho F F^{\prime\prime} = FF^\prime + \rho \left(F^\prime\right)^2+ \rho F F^{\prime\prime}
 ```
 
 Rewriting the above expression:
 
 ```math
-\rho \left(F^\prime\right)^2 = \frac{\partial}{\partial\rho}\left( \rho F F^\prime  \right) - \rho F F^" - F F^\prime 
+\rho \left(F^\prime\right)^2 = \frac{\partial}{\partial\rho}\left( \rho F F^\prime  \right) - \rho F F^{\prime\prime} - F F^\prime 
 ```
 
 Integrating on both sides:
 
 ```math
-\int_b^a \rho \left(F^\prime\right)^2  d\rho = \left[\rho F F^\prime\right]_b^a - \int_b^a F F^\prime d\rho - \int_b^a\rho F F^" d\rho
+\int_b^a \rho \left(F^\prime\right)^2  d\rho = \left[\rho F F^\prime\right]_b^a - \int_b^a F F^\prime d\rho - \int_b^a\rho F F^{\prime\prime} d\rho
 ```
 
 We want to simplify the term with the second derivative. If we multiply Bessel's ODE we get:
 
 ```math
-\left( \rho^2 F^" + \rho F^\prime + \left( k_c^2\rho^2 - m^2\right)F\right)\rho F = \left(0\right) \rho F
+\left( \rho^2 F^{\prime\prime} + \rho F^\prime + \left( k_c^2\rho^2 - m^2\right)F\right)\rho F = \left(0\right) \rho F
 ```
 ```math
-\rho F F^" + F F' + \left( k_c^2 \rho - \frac{m^2}{\rho}\right)F^2 = 0
+\rho F F^{\prime\prime} + F F^{\prime} + \left( k_c^2 \rho - \frac{m^2}{\rho}\right)F^2 = 0
 ```
 ```math
-\rho F F^" = -F F' - \left(k_c^2\rho-\frac{m^2}{\rho}\right)F^2
+\rho F F^{\prime\prime} = -F F^{\prime} - \left(k_c^2\rho-\frac{m^2}{\rho}\right)F^2
 ```
 
 After algebraic manipulation with the previous results, we get:
 
 ```math
-\int_b^a \rho \left(F^\prime\right)^2  d\rho = \left[\rho F F^\prime\right]_b^a - \int_b^a F F^\prime d\rho - \int_b^a \left( -F F' - \left(k_c^2\rho-\frac{m^2}{\rho}\right)F^2\right) d\rho
+\int_b^a \rho \left(F^\prime\right)^2  d\rho = \left[\rho F F^\prime\right]_b^a - \int_b^a F F^\prime d\rho - \int_b^a \left( -F F^{\prime} - \left(k_c^2\rho-\frac{m^2}{\rho}\right)F^2\right) d\rho
 ```
 
 ```math
-\int_b^a \rho \left(F^\prime\right)^2  d\rho = \left[\rho F F^\prime\right]_b^a - \int_b^a F F^\prime d\rho + \int_b^a F F'd\rho +\int_b^a  \left(k_c^2\rho-\frac{m^2}{\rho}\right)F^2 d\rho
+\int_b^a \rho \left(F^\prime\right)^2  d\rho = \left[\rho F F^\prime\right]_b^a - \int_b^a F F^\prime d\rho + \int_b^a F F^{\prime}d\rho +\int_b^a  \left(k_c^2\rho-\frac{m^2}{\rho}\right)F^2 d\rho
 ```
 
 ```math
@@ -266,13 +266,13 @@ F_0 = \sqrt{ \frac{2}{\displaystyle \frac{\omega\mu\beta}{k_c^4} 2\pi I } }
 ### TE Modes
 
 ```math
-F_0 = \sqrt{ \frac{2}{\displaystyle \frac{\omega\varpepsilon\beta}{k_c^4} \pi I } }
+F_0 = \sqrt{ \frac{2}{\displaystyle \frac{\omega\varepsilon\beta}{k_c^4} \pi I } }
 ```
 
 When ``m=0`` 
 
 ```math
-F_0 = \sqrt{ \frac{2}{\displaystyle \frac{\omega\varpepsilon\beta}{k_c^4} 2\pi I } }
+F_0 = \sqrt{ \frac{2}{\displaystyle \frac{\omega\varepsilon\beta}{k_c^4} 2\pi I } }
 ```
 
 ## Coaxial Waveguide
@@ -290,16 +290,16 @@ B_m = -\frac{J_m'(k_c b)}{Y_m'(k_c b)}
 
 The radial function becomes
 ```math
-F(m, \rho, k_c, A_m, B_m) = A_m J_m(k_c\rho) + B_m Y_m(k_c\rho)
+F = A_m J_m(k_c\rho) + B_m Y_m(k_c\rho)
 ```
 ```math
-F'(m, \rho, k_c, A_m, B_m) = k_c \left[ A_m J_m'(k_c\rho) + B_m Y_m'(k_c\rho) \right]
+F^{\prime} = k_c \left[ A_m J_m'(k_c\rho) + B_m Y_m'(k_c\rho) \right]
 ```
 
 The integral **I** has two parts:
 
 ```math
-I_1 = \left[ xF(x)F'(x)\right]_b^a = \left( a F(a) F'(a)\right) - \left( b F(b) F'(b)\right) 
+I_1 = \left[ xF(x)F^{\prime}(x)\right]_b^a = \left( a F(a) F^{\prime}(a)\right) - \left( b F(b) F^{\prime}(b)\right) 
 ```
 
 and
@@ -353,7 +353,7 @@ where the longitudinal field ``E_z`` or ``H_z`` (*TM* or *TE* modes) is defined 
 For **TE modes**, integrating the power flow:
 
 ```math
-P = \frac{1}{2} \int_0^{2\pi} \int_0^h \frac{j\mu\omega}{k_c^2}\psi'\text{cos}(m\varphi)\text{sin}(\frac{n\pi}{h}z) \psi^*\text{sin}(\frac{n\pi}{h}z)\text{cos}(m\varphi) \rho d\varphi dz
+P = \frac{1}{2} \int_0^{2\pi} \int_0^h \frac{j\mu\omega}{k_c^2}\psi^{\prime}\text{cos}(m\varphi)\text{sin}(\frac{n\pi}{h}z) \psi^*\text{sin}(\frac{n\pi}{h}z)\text{cos}(m\varphi) \rho d\varphi dz
 ```
 
 The longitudinal and angular integrals yield:
@@ -369,7 +369,7 @@ The longitudinal and angular integrals yield:
 Thus, the total power simplifies to:
 
 ```math
-P = \frac{1}{2} \text{Re} \left[ \frac{j\mu\omega}{k_c^2} \cdot \frac{h}{2} \cdot \alpha_m \cdot \rho \cdot \psi(\rho) \psi'(\rho) \right]
+P = \frac{1}{2} \text{Re} \left[ \frac{j\mu\omega}{k_c^2} \cdot \frac{h}{2} \cdot \alpha_m \cdot \rho \cdot \psi(\rho) \psi^{\prime}(\rho) \right]
 ```
 
 ```math

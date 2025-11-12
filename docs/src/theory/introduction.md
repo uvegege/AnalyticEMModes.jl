@@ -1,3 +1,3 @@
 # Introduction
 
-work in progress
+ **[Power normalization](theory/power_normalization.md)**
