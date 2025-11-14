@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Elliptic · AnalyticEMModes.jl</title><meta name="title" content="Elliptic · AnalyticEMModes.jl"/><meta property="og:title" content="Elliptic · AnalyticEMModes.jl"/><meta property="twitter:title" content="Elliptic · AnalyticEMModes.jl"/><meta name="description" content="Documentation for AnalyticEMModes.jl."/><meta property="og:description" content="Documentation for AnalyticEMModes.jl."/><meta property="twitter:description" content="Documentation for AnalyticEMModes.jl."/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">AnalyticEMModes.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">AnalyticEMModes.jl</a></li><li><a class="tocitem" href="../../Usage/">Usage Guide</a></li><li><span class="tocitem">Examples</span><ul><li><a class="tocitem" href="../../Examples/">Gallery</a></li><li><a class="tocitem" href="../../Rectangular/rectangular/">Rectangular</a></li><li><input class="collapse-toggle" id="menuitem-3-3" type="checkbox"/><label class="tocitem" for="menuitem-3-3"><span class="docs-label">Cylindrical</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../Cylindrical/Circular/">Circular Waveguides</a></li><li><a class="tocitem" href="../../Cylindrical/Coaxial/">Coaxial Waveguides</a></li><li><a class="tocitem" href="../../Cylindrical/Radial/">Radial &amp; Wedge</a></li></ul></li><li class="is-active"><a class="tocitem" href>Elliptic</a><ul class="internal"><li><a class="tocitem" href="#Numerical-Example"><span>Numerical Example</span></a></li><li><a class="tocitem" href="#Analytical-Solutions"><span>Analytical Solutions</span></a></li><li><a class="tocitem" href="#Transverse-Field-Components"><span>Transverse Field Components</span></a></li></ul></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Examples</a></li><li class="is-active"><a href>Elliptic</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Elliptic</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/uvegege/AnalyticEMModes.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/uvegege/AnalyticEMModes.jl/blob/main/docs/src/Elliptic/elliptic.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Elliptic-Waveguide"><a class="docs-heading-anchor" href="#Elliptic-Waveguide">Elliptic Waveguide</a><a id="Elliptic-Waveguide-1"></a><a class="docs-heading-anchor-permalink" href="#Elliptic-Waveguide" title="Permalink"></a></h1><p>Elliptic waveguides are less common than the rectangular and circular geometries. Like other waveguide types, they support both <strong>TE</strong> and <strong>TM</strong> modes. Their distinctive characteristic is that they admit <em>even</em> and <em>odd</em> solution pairs formed using even and odd Mathieu functions. Consequently, except for m = 0, each mode designation (m, n) corresponds to two distinct modes with different cutoff frequencies.</p><h2 id="Numerical-Example"><a class="docs-heading-anchor" href="#Numerical-Example">Numerical Example</a><a id="Numerical-Example-1"></a><a class="docs-heading-anchor-permalink" href="#Numerical-Example" title="Permalink"></a></h2><p>As in previous sections, we first present numerical solutions obtained with <code>Gridap.jl</code> to serve as validation references for the analytical expressions.</p><blockquote><p>Mesh files (.msh) can be found in <em>\src\Assets\mesh</em> and are generated with Gmsh.jl using functions in <em>\src\Assets\example_mesh.jl</em>.</p></blockquote><p>The Hz field (longitudinal magnetic component) for the first <strong>TE</strong> modes computed numerically:</p><pre><code class="language-julia hljs">
+using GLMakie
+
+name = &quot;../Assets/mesh/elliptic_wg1.msh&quot;
+a = 1
+b = 0.7
+ellipticwg_mesh(a, b; dl = 0.05, name)
+model = GmshDiscreteModel(name, renumber = false)
+
+
+A_te, B_te, U_te, V_te = engeimode_gridap(model, :TE, order = 2)
+A_tm, B_tm, U_tm, V_tm = engeimode_gridap(model, :TM, order = 2)
+
+nev = 24
+λ_te, ϕ_te = eigs(A_te, B_te; nev=nev, which=:SM, maxiter=5300)
+λ_tm, ϕ_tm = eigs(A_tm, B_tm; nev=nev, which=:SM, maxiter=5300)
+
+
+t = range(0, 2*pi, length=100)
+ellip_x_r = @. b * sin(t)
+ellip_y_r = @. a * cos(t)
+
+tria = Triangulation(model)
+gridap_coords = get_node_coordinates(model)
+makie_coords = map(x-&gt;Point2f(x.data), gridap_coords)
+face_to_nodes = stack(map(x-&gt;x, get_cell_node_ids(model)))&#39;
+
+fig = Figure(size = (1300, 910))
+plot_ids = Iterators.product(1:5, 1:4) |&gt; collect |&gt; vec
+for (idp, (ii, jj)) in enumerate(plot_ids)
+    uh = FEFunction(V_te, real.(ϕ_te[:, idp+1]), get_dirichlet_dof_values(V_te))
+    gridap_values = evaluate(uh, gridap_coords)
+    fz_num = abs.(gridap_values)
+    fz_num = fz_num / maximum(fz_num)
+    coord2 = makie_coords[argmin(fz_num)]
+    axi = Axis(fig[jj,ii])
+    t = lines!(axi, ellip_y_r, ellip_x_r, linewidth = 3.5, color = :black)
+    translate!(t, (0, 0, 2))
+    xlims!(-a*1.1, a*1.1)
+    ylims!(-a, a)
+    mesh!(axi, makie_coords, face_to_nodes, color = fz_num, colormap = :jet)
+    hidedecorations!(axi)
+end
+Label(fig[0, 2:4], &quot;Numeric TE Modes&quot;, fontsize = 20)
+fig</code></pre><p><img src="../../Assets/images/ellip_gridap1.png" alt="Image 5"/></p><p>The numerical eigenmode solution reveals the complex field patterns characteristic of elliptic geometries. </p><p>The Ez field (longitudinal electric component) for the first <strong>TM</strong> modes:</p><pre><code class="language-julia hljs">fig = Figure(size = (1300, 910))
+plot_ids = Iterators.product(1:5, 1:4) |&gt; collect |&gt; vec
+for (idp, (ii, jj)) in enumerate(plot_ids)
+    uh = FEFunction(V_tm, real.(ϕ_tm[:, idp]), get_dirichlet_dof_values(V_tm))
+    gridap_values = evaluate(uh, gridap_coords)
+    fz_num = abs.(gridap_values)
+    fz_num = fz_num / maximum(fz_num)
+    coord2 = makie_coords[argmin(fz_num)]
+    axi = Axis(fig[jj,ii])
+    t = lines!(axi, ellip_y_r, ellip_x_r, linewidth = 3.5, color = :black)
+    translate!(t, (0, 0, 2))
+    xlims!(-a*1.1, a*1.1)
+    ylims!(-a, a)
+    mesh!(axi, makie_coords, face_to_nodes, color = fz_num, colormap = :jet)
+    hidedecorations!(axi)
+end
+Label(fig[0, 2:4], &quot;Numeric TM Modes&quot;, fontsize = 20)
+fig</code></pre><p><img src="../../Assets/images/ellip_gridap2.png" alt="Image 6"/></p><p>TM modes in elliptical waveguides exhibit similar complexity, with field patterns governed by the interplay of Mathieu functions in both coordinate directions.</p><h2 id="Analytical-Solutions"><a class="docs-heading-anchor" href="#Analytical-Solutions">Analytical Solutions</a><a id="Analytical-Solutions-1"></a><a class="docs-heading-anchor-permalink" href="#Analytical-Solutions" title="Permalink"></a></h2><p>The analytical evaluation of elliptic waveguide modes uses Mathieu functions, which are more computationally intensive than Bessel or trigonometric functions. The field solutions require evaluating both angular Mathieu functions (ceₘ, seₘ for even/odd) and radial Mathieu functions (Ceₘ, Seₘ). To improve computational efficiency, the Mathieu function coefficients can be pre-computed outside the field evaluation calls.</p><p>The following code evaluates the analytical <strong>TE</strong> mode fields using <code>te_ewg_fields</code>. The parameter <code>even</code> determines whether even (true) or odd (false) Mathieu functions are used, corresponding to different mode symmetries and cutoff frequencies.</p><pre><code class="language-julia hljs">using GLMakie
+
+name = &quot;../Assets/mesh/elliptic_wg1.msh&quot;
+a = 1
+b = 0.7
+#ellipticwg_mesh(a, b; dl = 0.05, name)
+
+coord, conn = mesh_data(name)
+coords = coord[:, 1:maximum(conn)]
+xcoords = coords[1, :]
+ycoords = coords[2, :]
+
+ellipcoords = map((x, y) -&gt; cart2elliptic(x, y, a, b), xcoords, ycoords)
+ξcoords = getindex.(ellipcoords, 1)
+ηcoords = getindex.(ellipcoords, 2)
+
+t = range(0, 2*pi, length=100)
+ellip_x_r = @. b * sin(t)
+ellip_y_r = @. a * cos(t)
+
+modekind = [(1, 1, true), (1, 1, false), (2, 1, true), (2, 1, false), (3, 1, true),
+            (3, 1, false), (0, 1, true), (4, 1, true), (4, 1, false),  (1, 2, true), (1, 2, false),
+            (5, 1, true), (5, 1, false), (2, 2, true), (2, 2, false), (6, 1, true), (6, 1, false),
+            (3, 2, true), (0, 2, true), (3, 2, false)]
+
+plot_ids = Iterators.product(1:5, 1:4) |&gt; collect |&gt; vec
+
+fig = Figure(size = (1300, 910))
+for (idplot, (m, n, even)) in enumerate(modekind)
+    ii,jj = plot_ids[idplot]
+
+    fields = te_ewg_fields(ξcoords, ηcoords, a, b, m, n, even, 100e9, 1.0, 1.0)
+    fz = getindex.(fields, 6)
+
+    stitle = even ? L&quot;TE_{c%$m%$n}&quot; : L&quot;TE_{e%$m%$n}&quot;
+    axi = Axis(fig[jj,ii], title = stitle, titlesize = 20)
+    hidedecorations!(axi)
+
+    t = lines!(axi, ellip_y_r, ellip_x_r, linewidth = 3.5, color = :black)
+        translate!(t, (0, 0, 2))
+
+    mesh!(axi, coords, conn, color = abs.(fz), colormap = :jet)
+    xlims!(-a*1.1, a*1.1)
+    ylims!(-a, a)
+end
+fig</code></pre><img src="98a3f3f8.png" alt="Example block output"/><p>The visualization shows 20 TE modes with labels indicating even (c) or odd (e) character. Note that for m &gt; 0, both even and odd modes exist with different cutoff frequencies and patterns.</p><p><strong>TM modes</strong> for the same elliptic geometry:</p><pre><code class="language-julia hljs">modekind = [(0, 1, true),(1, 1, true),(1, 1, false),(2, 1, true),(2, 1, false),(3, 1, true),
+            (0, 2, true),(3, 1, false),(1, 2, true),(4, 1, true),(4, 1, false),(1, 2, false),
+            (2, 2, true),(5, 1, true),(5, 1, false),(2, 2, false),(3, 2, true),(6, 1, true),
+            (6, 1, false),(0, 3, true)]
+
+fig = Figure(size = (1300, 910))
+for (idplot, (m, n, even)) in enumerate(modekind)
+    ii,jj = plot_ids[idplot]
+
+    fields = tm_ewg_fields(ξcoords, ηcoords, a, b, m, n, even, 100e9, 1.0, 1.0)
+    fz = getindex.(fields, 3)
+
+    stitle = even ? L&quot;TM_{c%$m%$n}&quot; : L&quot;TM_{e%$m%$n}&quot;
+    axi = Axis(fig[jj,ii], title = stitle, titlesize = 20)
+    hidedecorations!(axi)
+
+    t = lines!(axi, ellip_y_r, ellip_x_r, linewidth = 3.5, color = :black)
+    translate!(t, (0, 0, 2))
+
+    mesh!(axi, coords, conn, color = abs.(fz), colormap = :jet)
+    xlims!(-a*1.1, a*1.1)
+    ylims!(-a, a)
+end
+fig</code></pre><img src="e636c062.png" alt="Example block output"/><p>The even/odd distinction is clearly visible in the field symmetries.</p><h2 id="Transverse-Field-Components"><a class="docs-heading-anchor" href="#Transverse-Field-Components">Transverse Field Components</a><a id="Transverse-Field-Components-1"></a><a class="docs-heading-anchor-permalink" href="#Transverse-Field-Components" title="Permalink"></a></h2><p>For elliptic coordinates, the transverse field components require coordinate transformation from the native elliptic system (ξ, η) to Cartesian coordinates (x, y). The <code>metric_and_unit_elliptic</code> function provides the necessary metric coefficients and unit vector components for this transformation.</p><p>The following example visualizes the transverse magnetic field for selected TM modes:</p><pre><code class="language-julia hljs">ρ = sqrt(a^2-b^2)
+
+modekind = [(0, 1, true),(1, 1, true),(1, 1, false),(2, 1, true),(2, 1, false),(3, 1, true)]
+plot_ids = Iterators.product(1:3, 1:2) |&gt; collect |&gt; vec
+
+fig = Figure(size = (1300, 910))
+for (idplot, (m, n, even)) in enumerate(modekind)
+    ii,jj = plot_ids[idplot]
+
+    fields = tm_ewg_fields(ξcoords, ηcoords, a, b, m, n, even, 100e9, 1.0, 1.0)
+
+    fz = map(fields, ξcoords, ηcoords) do ehfields, ξi, ηi
+        h, exi_x, exi_y, eeta_x, eeta_y = metric_and_unit_elliptic(ρ, ξi, ηi)
+        Fx = ehfields[4] * exi_x + ehfields[5] * eeta_x
+        Fy = ehfields[4] * exi_y + ehfields[5] * eeta_y
+        return (Fx, Fy)
+    end
+
+    stitle = even ? L&quot;TM_{c%$m%$n}&quot; : L&quot;TM_{e%$m%$n}&quot;
+    axi = Axis(fig[jj,ii], title = stitle, titlesize = 20)
+    hidedecorations!(axi)
+
+    t = lines!(axi, ellip_y_r, ellip_x_r, linewidth = 3.5, color = :black)
+        translate!(t, (0, 0, 2))
+
+    fu = real.(getindex.(fz, 1))
+    fv = real.(getindex.(fz, 2))
+    ft = map(x-&gt;hypot(x...), fz) * 35
+    vm = maximum(ft)*10
+    fu = fu ./ ft
+    fv = fv ./ ft
+
+    arrows2d!(axi, xcoords, ycoords, fu, fv, color = ft, colormap = :jet)
+
+    xlims!(-a*1.1, a*1.1)
+    ylims!(-a, a)
+end
+fig</code></pre><img src="f4f1fc47.png" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../Cylindrical/Radial/">« Radial &amp; Wedge</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.15.0 on <span class="colophon-date" title="Friday 14 November 2025 11:21">Friday 14 November 2025</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
