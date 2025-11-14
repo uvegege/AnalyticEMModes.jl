@@ -18,7 +18,7 @@ module AnalyticEMModes
     include("./ellipticalwg.jl") 
     
     # Spherical Coordinates
-    #include("./Spherical.jl") # TODO
+    include("./spherical.jl") # TODO
 
     # Sort modes
     include("./sortmodes.jl")
@@ -45,5 +45,8 @@ module AnalyticEMModes
     
     export first_n_modes_rwg, first_n_modes_cwg, first_n_modes_coax, first_n_modes_radial, first_n_modes_ewg
 
+    export kc_sph, te_sph_fields_lmax, tm_sph_fields_lmax, tm_sph_fields, te_sph_fields, first_n_modes_sph, spherical_to_cartesian_fields
 end
+
+using .AnalyticEMModes
 

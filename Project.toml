@@ -1,15 +1,19 @@
 name = "AnalyticEMModes"
-version = "0.1.0"
 uuid = "4347a9b3-a74f-4459-95f9-6cf3b5a9075d"
+version = "0.1.0"
 
 [deps]
 Bessels = "0e736298-9ec6-45e8-9647-e4fc86a2fe38"
 MathieuF = "1d5ea620-0e37-47ee-af2a-0a7cf7ec3863"
+SpheriCart = "5caf2b29-02d9-47a3-9434-5931c85ba645"
+StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [compat]
 Bessels = "0.2.8"
 MathieuF = "0.1.5"
 julia = "1.10"
+SpheriCart = "0.2.3"
+StaticArrays = "1.9.15"
 
 [extras]
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
