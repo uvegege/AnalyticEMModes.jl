@@ -13,7 +13,7 @@ For the computation of spherical modes, for reasons of efficiency and implementa
 
 With `lmax = 6` you have 49 **TE** modes.
 
-```julia
+```@example
 
 using StaticArrays
 
