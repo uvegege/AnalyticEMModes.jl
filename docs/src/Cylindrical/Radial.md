@@ -52,6 +52,22 @@ fig
 
 The mode indices (m, n) determine the number of azimuthal and vertical variations, respectively. Notice how modes with m = 0 are axisymmetric, while modes with m > 0 exhibit azimuthal nodal planes.
 
+We can also visualize the real (or imaginary) part:
+
+```@example
+fig = Figure(size = (1200, 900))
+for (idplot, (m, n)) in enumerate(modekind)
+    stitle = L"TE_{%$m%$n}"
+    ii, jj = plot_ids[idplot]
+    axi = Axis3(fig[jj,ii], title = stitle, titlesize = 20)
+    hidedecorations!(axi)
+    fields = te_radial_fields(rcoords, ϕcoords, zcoords, H, m, n, 0.0, 1.0, 100e9, 1, 1)
+    fz = getindex.(fields, 4)
+    mesh!(axi, coords, conn, color = real.(fz), colormap = :jet, interpolate = false)
+end
+fig
+```
+
 ## TM Modes
 
 The following shows the Eρ field patterns for the first 12 TM modes:
@@ -72,12 +88,26 @@ for (idplot, (m, n)) in enumerate(modekind)
     hidedecorations!(axi)
     fields = tm_radial_fields(rcoords, ϕcoords, zcoords, H, m, n, 0.0, 1.0, 100e9, 1, 1)
     fz = getindex.(fields, 1)
-    mesh!(axi, coords, conn, color = abs.(fz), colormap = :jet, interpolate = false)
+    mesh!(axi, coords, conn, color = real.(fz), colormap = :jet, interpolate = false)
 end
 fig
 ```
 
 TM modes satisfy boundary conditions where Eρ = 0 at the top and bottom conducting plates (at z = 0 and z = H).
+
+```@example
+fig = Figure(size = (1200, 900))
+for (idplot, (m, n)) in enumerate(modekind)
+    stitle = L"TM_{%$m%$n}"
+    ii, jj = plot_ids[idplot]
+    axi = Axis3(fig[jj,ii], title = stitle, titlesize = 20)
+    hidedecorations!(axi)
+    fields = tm_radial_fields(rcoords, ϕcoords, zcoords, H, m, n, 0.0, 1.0, 100e9, 1, 1)
+    fz = getindex.(fields, 1)
+    mesh!(axi, coords, conn, color = imag.(fz), colormap = :jet, interpolate = false)
+end
+fig
+```
 
 # Wedge Waveguide
 
@@ -121,7 +151,7 @@ for (idplot, (m, n)) in enumerate(modekind)
     fields = te_wedge_fields(rcoords, ϕcoords, zcoords, H, ϕ0, m, n, 1.0, 0.0, 100e9, 1, 1)
     fz = getindex.(fields, 6)
     m1 = mesh!(axi, coord, connf, color = :gray)
-    m2 = mesh!(axi, coords, new_conn, color = abs.(fz), colormap = :jet)
+    m2 = mesh!(axi, coords, new_conn, color = real.(fz), colormap = :jet)
 end
 fig
 ```

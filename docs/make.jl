@@ -18,9 +18,10 @@ makedocs(modules = [AnalyticEMModes],
             "Cylindrical" => Any[
                 "Circular Waveguides" => "Cylindrical/Circular.md",
                 "Coaxial Waveguides" => "Cylindrical/Coaxial.md",
-                "Radial & Wedge" => "Cylindrical/Radial.md"
+                "Radial & Wedge" => "Cylindrical/Radial.md",
             ],
-            "Elliptic" => "Elliptic/elliptic.md"
+            "Elliptic" => "Elliptic/elliptic.md",
+            "Spherical" => "Spherical/spherical.md"
         ],
         "Theory" => Any[
             "Introduction" => "theory/introduction.md",

@@ -12,18 +12,18 @@ From the Julia REPL:
 
 ```julia
 using Pkg
-Pkg.add(url="https://github.com/uvegege/AnalyticEMModes.jl/")
+Pkg.add("AnalyticEMModes")
 ```
 
 Or in package mode (type `]`):
 
 ```
-pkg> add https://github.com/uvegege/AnalyticEMModes.jl/
+pkg> add AnalyticEMModes
 ```
 
 ## Supported Geometries
 
-| Waveguide Type | Alias | Coordinate System | Power Normalization |
+| Type | Alias | Coordinate System | Power Normalization |
 |:---------------|:------|:------------------|:-------------------:|
 | Rectangular    | `rwg` | (x, y)           | ✓                   |
 | Circular       | `cwg` | (r, θ)           | ✓                   |
@@ -31,4 +31,5 @@ pkg> add https://github.com/uvegege/AnalyticEMModes.jl/
 | Radial         | `radial`| (ρ, φ, z)      | ✓                   |
 | Wedge          | `wedge` | (ρ, φ, z)      | ✓                   |
 | Elliptical       | `ewg` | (ξ, η)           | ✗                   |
-| Spherical      | —     | (r, θ, φ)        | 🚧 Under development |
+| Spherical      | `sph` | (r, θ, φ)      | ✓                   |
+| Spheroidal      | `spheroidal` | (_, _, _)      | 🚧 Under development |

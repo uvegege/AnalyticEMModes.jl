@@ -380,3 +380,37 @@ The same procedure and result applies to TM modes, replacing ``\mu`` by ``\varep
 
 
 
+## Spherical Modes
+
+The Poynting vector in spherical coordinates has the radial component:
+
+```math
+S_r = (\mathbf{E} \times \mathbf{H}^*) \cdot \hat{\mathbf{r}} = E_\theta H_\phi^* - E_\phi H_\theta^*
+```
+
+The angular integrals are:
+
+```math
+\oint |Y_{lm}|^2 d\Omega = 1,\quad \oint |\nabla_\perp Y_{lm}|^2 d\Omega = l(l+1)
+```
+
+The radiated power can be expressed as:
+
+```math
+P \propto \frac{r^2}{2\omega\mu\varepsilon^2} \Re\left[i R_l(kr) R_l'(kr)^*\right] l(l+1)
+```
+
+with ``R_l(kr) = h_l^{(1)}(kr)`` or ``h_l^{(2)}(kr)``  for incoming or outgoing waves, respectively.
+
+```math
+P = \left| \frac{k r^2}{2\omega\mu\varepsilon^2} \Re\left[i R R'\right] l(l+1) \right|
+```
+
+The normalization factor for 1W power is:
+
+```math
+F_0 = \sqrt\frac{1}{P}
+```
+
+
+

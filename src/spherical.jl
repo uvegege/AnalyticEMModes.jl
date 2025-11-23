@@ -1,16 +1,41 @@
+#TODO: Use normalisation = :sphericart -  the same as `:L2`, gives L2-orthonormality, i.e. ∫ |Ylm|² = 1?
+#TODO:     basis = SphericalHarmonics(lmax) is type unstable
+# I put everything inside a function barrier and perfomance is good. In any case, it would be good if it were type stable.
+
 using SpheriCart, StaticArrays
 
 kc_sph() = 0.0
 
 # spherical bessel functions
-jm(m, x) = sphericalbesselj(m, x)
-ym(m, x) = sphericalbessely(m, x)
-h1m(m, x) = sphericalbesselj(m, x) - im * sphericalbessely(m, x)
-h2m(m, x) = sphericalbesselj(m, x) + im * sphericalbessely(m, x)
+@inline jm(m, x) = sphericalbesselj(m, x)
+@inline ym(m, x) = sphericalbessely(m, x)
+@inline h1m(m, x) = sphericalbesselj(m, x) + im * sphericalbessely(m, x)
+@inline h2m(m, x) = sphericalbesselj(m, x) - im * sphericalbessely(m, x)
 sph_jm(m, x) = x * jm(m, x)
 sph_ym(m, x) = x * ym(m, x)
 sph_h1m(m, x) = x * h1m(m, x)
 sph_h2m(m, x) = x * h2m(m, x)
+
+
+"""
+    to_svector3(x, y, z)
+
+Transform a coordinate or coordinate vectors into a vector of SVector{3,T} 
+so that the user does not need to import StaticArrays to calculate problems in 
+spherical coordinates with SpheriCart.jl.
+"""
+function to_svector3(x, y, z)
+    return SVector(x, y, z)
+end
+
+function to_svector3(x::AbstractArray{T, N}, y::AbstractArray{T, N}, z::AbstractArray{T, N}) where {T, N}
+    coords = similar(x, SVector{3, T})
+    for i in eachindex(coords)
+        coords[i] = SVector(x[i], y[i], z[i])
+    end
+    return coords
+end
+
 
 function cart2sph(x, y, z)
     r = hypot(x, y, z)
@@ -52,26 +77,6 @@ sph_ym_with_derivatives(l, x) = sph_bessel_with_derivatives(sph_ym, l, x)
 sph_h1m_with_derivatives(l, x) = sph_bessel_with_derivatives(sph_h1m, l, x) 
 sph_h2m_with_derivatives(l, x) = sph_bessel_with_derivatives(sph_h2m, l, x) 
 
-function incident_wave(incident, l, k, r) 
-    x = k * r
-    if incident == true
-        return sph_bessel_with_derivatives(sph_h1m, l, x) 
-    else
-        return sph_bessel_with_derivatives(sph_h2m, l, x) 
-    end
-end
-
-function fill_rs!(Rs, r_vec, lmax, k, incident)
-    for l in 0:lmax
-        for i in eachindex(r_vec) 
-            x, y, z = r_vec[i]
-            r = hypot(x, y, z)
-            R, R´, R´´ = incident_wave(incident, l, k, r)
-            Rs[i, l+1] = (R, R´, R´´)
-        end
-    end
-end
-
 
 function sph_modal_f(θ, φ, rs, ylm, ylm_p, k)
 
@@ -91,7 +96,7 @@ function sph_modal_f(θ, φ, rs, ylm, ylm_p, k)
     return (ψ, ∂ψθ, ∂ψφ, ∂²ψᵣθ, ∂²ψᵣφ ,∂²ψᵣᵣ)
 end
 
-
+#TODO: move ω outside
 function te_sph_fields(r, θ, ϕ, rs, ylm, ylm_p, k, μᵣ, εᵣ)
 
     μ = μᵣ * _μₒ
@@ -99,14 +104,6 @@ function te_sph_fields(r, θ, ϕ, rs, ylm, ylm_p, k, μᵣ, εᵣ)
     ω = k / sqrt(μ * ε)
 
     ψ, ∂ψθ, ∂ψφ, ∂²ψᵣθ, ∂²ψᵣφ ,∂²ψᵣᵣ = sph_modal_f(θ, ϕ, rs, ylm, ylm_p, k)
-
-    #E_θ = -1/ε * 1/(r*sin(θ)) * ∂ψφ
-    #E_ϕ =  1/ε * 1/r * ∂ψθ
-    #E_r = zero(E_θ)
-    #
-    #H_r = 1/(im*ω*μ*ε) * (∂²ψᵣᵣ + k^2 * ψ)
-    #H_θ = 1/(im*ω*μ*ε) * 1/r * ∂²ψᵣθ
-    #H_ϕ = 1/(im*ω*μ*ε) * 1/(r*sin(θ)) * ∂²ψᵣφ
 
     E_θ = -1/ε * ∂ψφ
     E_ϕ =  1/ε * ∂ψθ
@@ -116,12 +113,11 @@ function te_sph_fields(r, θ, ϕ, rs, ylm, ylm_p, k, μᵣ, εᵣ)
     H_θ = 1/(im*ω*μ*ε) * ∂²ψᵣθ
     H_ϕ = 1/(im*ω*μ*ε) * ∂²ψᵣφ
 
-
     return (E_r, E_θ, E_ϕ, H_r, H_θ, H_ϕ)
 end
 
 
-function te_sph_fields(r_vec, rs, ylm, ylm_p, k, μᵣ, εᵣ)
+function te_sph_fields(r_vec::SVector{3, T}, rs, ylm, ylm_p, k, μᵣ, εᵣ) where T
     x, y, z = r_vec
     r, θ, ϕ = cart2sph(x, y, z)
     return te_sph_fields(r, θ, ϕ, rs, ylm, ylm_p, k, μᵣ, εᵣ)
@@ -138,8 +134,9 @@ function te_sph_fields(r_vec::Vector{SVector{3, T}}, rs, ylm, ylm_p, k, μᵣ, �
     return fields
 end
 
+
 """
-    te_sph_fields_lmax(r_vec, lmax, f, μᵣ, εᵣ; incident = false)
+    te_sph_fields_lmax(r_vec, lmax, f, μᵣ, εᵣ, incident)
 
 # Arguments
 - `r_vec`: vector of `SVector{3, T}` with the position of each point in cartesian coordinates.
@@ -147,24 +144,35 @@ end
 - `f`: Frequency in Hz
 - `μᵣ`: Relative permeability
 - `εᵣ`: Relative permittivity
-- `incident`: ongoing or outgoing wave.
+- `incident`: ongoing or outgoing wave (`true` or `false`)
 
 """
-function te_sph_fields_lmax(r_vec, lmax, f, μᵣ, εᵣ; incident = false)
+function te_sph_fields_lmax(r_vec, lmax::Int, f, μᵣ, εᵣ, incident)
 
+    basis = SphericalHarmonics(lmax, normalisation = :sphericart)
     A = Array{NTuple{6, ComplexF64}, 2}(undef, length(r_vec), (lmax+1)^2)
     Rs = Matrix{NTuple{3, ComplexF64}}(undef, length(r_vec), lmax+1)
+    _te_sph_fields_lmax!(A, Rs, r_vec, basis, lmax, f, μᵣ, εᵣ, incident)
+    
+    return A
+end
+
+
+function _te_sph_fields_lmax!(A, Rs, r_vec, basis, lmax::Int, f, μᵣ, εᵣ, incident)
+
+
+    sph_coords = map(x->cart2sph(x[1], x[2], x[3]),r_vec)
 
     k = wavenumber(f, μᵣ, εᵣ)
     for l in 0:lmax
         for i in eachindex(r_vec) 
             x, y, z = r_vec[i]
             r = hypot(x, y, z)
-            Rs[i, l+1] = incident == true ? sph_h1m_with_derivatives(l, k*r) : sph_h2m_with_derivatives(l, k*r)
+            R, R´, R´´ =  incident == true ? sph_h1m_with_derivatives(l, k*r) : sph_h2m_with_derivatives(l, k*r)
+            Rs[i, l+1] = (R, R´, R´´)
         end
     end
 
-    basis = SphericalHarmonics(lmax)
     Ylm, ∇Ylm = compute_with_gradients(basis, r_vec)
 
     for l in 0:lmax
@@ -172,11 +180,12 @@ function te_sph_fields_lmax(r_vec, lmax, f, μᵣ, εᵣ; incident = false)
             #idx = SpheriCart.lm2idx(l, m) # not public
             idx = l^2 + l + m + 1
             for ijk in eachindex(r_vec)
-                A[ijk, idx] = te_sph_fields(r_vec[ijk], Rs[ijk, l+1], Ylm[ijk, idx], ∇Ylm[ijk, idx], k, μᵣ, εᵣ)
+                r, θ, ϕ = sph_coords[ijk]
+                A[ijk, idx] = te_sph_fields(r, θ, ϕ, Rs[ijk, l+1], Ylm[ijk, idx], ∇Ylm[ijk, idx], k, μᵣ, εᵣ)
             end
         end
     end
-    return A
+    return nothing
 end
 
 
@@ -190,14 +199,6 @@ function tm_sph_fields(r, θ, ϕ, rs, ylm, ylm_p, k, μᵣ, εᵣ)
     ω = k / sqrt(μ * ε)
     ψ, ∂ψθ, ∂ψφ, ∂²ψᵣθ, ∂²ψᵣφ, ∂²ψᵣᵣ = sph_modal_f(θ, ϕ, rs, ylm, ylm_p, k)
     
-    #E_r = 1/(im*ω*μ*ε) * (∂²ψᵣᵣ + k^2 * ψ)
-    #E_θ = 1/(im*ω*μ*ε) * 1/r * ∂²ψᵣθ
-    #E_ϕ = 1/(im*ω*μ*ε) * 1/(r*sin(θ)) * ∂²ψᵣφ
-    #
-    #H_r = zero(E_θ)  
-    #H_θ = 1/μ * 1/(r*sin(θ)) * ∂ψφ
-    #H_ϕ = -1/μ * 1/r * ∂ψθ
-
     E_r = 1/(im*ω*μ*ε) * (∂²ψᵣᵣ + k^2 * ψ)
     E_θ = 1/(im*ω*μ*ε) * ∂²ψᵣθ
     E_ϕ = 1/(im*ω*μ*ε) * ∂²ψᵣφ
@@ -211,7 +212,7 @@ end
 
 
 """
-    tm_sph_fields_lmax(r_vec, lmax, f, μᵣ, εᵣ; incident = false)
+    tm_sph_fields_lmax(r_vec, lmax, f, μᵣ, εᵣ, incident)
 
 # Arguments
 - `r_vec`: vector of `SVector{3, T}` with the position of each point in cartesian coordinates.
@@ -219,36 +220,48 @@ end
 - `f`: Frequency in Hz
 - `μᵣ`: Relative permeability
 - `εᵣ`: Relative permittivity
-- `incident`: ongoing or outgoing wave.
+- `incident::Bool`: ongoing or outgoing wave.
 
 """
-function tm_sph_fields_lmax(r_vec, lmax, f, μᵣ, εᵣ; incident = false)
+function tm_sph_fields_lmax(r_vec, lmax::Int, f, μᵣ, εᵣ, incident)
 
+    basis = SphericalHarmonics(lmax, normalisation = :sphericart)
     A = Array{NTuple{6, ComplexF64}, 2}(undef, length(r_vec), (lmax+1)^2)
-    Rs = Array{NTuple{3, ComplexF64}, 2}(undef, length(r_vec), lmax+1)
+    Rs = Matrix{NTuple{3, ComplexF64}}(undef, length(r_vec), lmax+1)
+    _tm_sph_fields_lmax!(A, Rs, r_vec, basis, lmax, f, μᵣ, εᵣ, incident)
+    
+    return A
+end
+
+
+function _tm_sph_fields_lmax!(A, Rs, r_vec, basis, lmax::Int, f, μᵣ, εᵣ, incident)
+
+
+    sph_coords = map(x->cart2sph(x[1], x[2], x[3]),r_vec)
 
     k = wavenumber(f, μᵣ, εᵣ)
     for l in 0:lmax
         for i in eachindex(r_vec) 
             x, y, z = r_vec[i]
             r = hypot(x, y, z)
-            Rs[i, l+1] = incident == true ? sph_h1m_with_derivatives(l, k*r) : sph_h2m_with_derivatives(l, k*r)
+            R, R´, R´´ =  incident == true ? sph_h1m_with_derivatives(l, k*r) : sph_h2m_with_derivatives(l, k*r)
+            Rs[i, l+1] = (R, R´, R´´)
         end
     end
 
-    basis = SphericalHarmonics(lmax)
     Ylm, ∇Ylm = compute_with_gradients(basis, r_vec)
-    
+
     for l in 0:lmax
         for m in -l:l
             #idx = SpheriCart.lm2idx(l, m) # not public
             idx = l^2 + l + m + 1
             for ijk in eachindex(r_vec)
-                A[ijk, idx] = tm_sph_fields(r_vec[ijk], Rs[ijk, l+1], Ylm[ijk, idx], ∇Ylm[ijk, idx], k, μᵣ, εᵣ)
+                r, θ, ϕ = sph_coords[ijk]
+                A[ijk, idx] = tm_sph_fields(r, θ, ϕ, Rs[ijk, l+1], Ylm[ijk, idx], ∇Ylm[ijk, idx], k, μᵣ, εᵣ)
             end
         end
     end
-    return A
+    return nothing
 end
 
 function tm_sph_fields(r_vec, rs, ylm, ylm_p, k, μᵣ, εᵣ)
@@ -339,3 +352,58 @@ function spherical_to_cartesian_fields(E_r, E_θ, E_ϕ, H_r, H_θ, H_ϕ, θ, ϕ)
     
     return (E_x, E_y, E_z, H_x, H_y, H_z)
 end
+
+
+"""
+    tm_normalization_sph(r, k, incident, μᵣ, εᵣ)
+
+Normalization factor for TM modes to achieve unit power.
+
+The expression can be derived by integrating the Poynting vector over the cross-section of the guide.
+
+# Arguments
+- `l`: mode index
+- `r`: Radial coordinate
+- `k`: propagation constant
+- `incident::Bool`: ongoing or outgoing wave 
+- `μᵣ`: Relative permeability
+- `εᵣ`: Relative permittivity
+"""
+function tm_normalization_sph(l, r, k, incident, μᵣ, εᵣ)
+    ε = εᵣ * _εₒ
+    μ = μᵣ * _μₒ
+    c = 1 / sqrt(μ * ε)
+    ω = k * c
+    R, Rp, _ = incident == true ? sph_h1m_with_derivatives(l, k*r) : sph_h2m_with_derivatives(l, k*r)
+    P_unnormalized = abs( (k * r^2)/(2 * ω * μ^2 * ε) * real(im * R * Rp) * l * (l+1))
+    norm_factor = sqrt(1 / P_unnormalized)
+    return norm_factor
+end
+
+    
+"""
+    te_normalization_sph(l, r, k, incident, μᵣ, εᵣ)
+
+Normalization factor for TE modes to achieve unit power.
+
+The expression can be derived by integrating the Poynting vector over the cross-section of the guide.
+
+# Arguments
+- `l`: mode index
+- `r`: Radial coordinate
+- `k`: propagation constant
+- `incident::Bool`: ongoing or outgoing wave 
+- `μᵣ`: Relative permeability
+- `εᵣ`: Relative permittivity
+"""
+function te_normalization_sph(l, r, k, incident, μᵣ, εᵣ)
+    ε = εᵣ * _εₒ
+    μ = μᵣ * _μₒ
+    c = 1 / sqrt(μ * ε)
+    ω = k * c
+    R, Rp, _ = incident == true ? sph_h1m_with_derivatives(l, k*r) : sph_h2m_with_derivatives(l, k*r)
+    P_unnormalized = abs( (k * r^2)/(2 * ω * μ * ε^2) * real(im * R * Rp) * l * (l+1))
+    norm_factor = sqrt(1 / P_unnormalized)
+    return norm_factor
+end
+

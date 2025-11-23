@@ -103,7 +103,8 @@ In evanescent modes, ($P = 0$): the fields store energy locally but do not trans
 Modal fields satisfy an orthogonality condition that makes them particulary useful in analytical and numerical analysis:
 
 ```math
-\int_S (\mathbf{E}_m \times \mathbf{H}_n^*) \cdot \hat{\mathbf{n}}\, d\mathbf{S} = 0 \quad \text{for} \quad m \neq n```
+\int_S (\mathbf{E}_m \times \mathbf{H}_n^*) \cdot \hat{\mathbf{n}}\, d\mathbf{S} = 0 \quad \text{for} \quad m \neq n
+```
 
 This means each mode can propagate independently, and total fields can be expanded as a linear combination of modes:
 

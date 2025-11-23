@@ -8,13 +8,13 @@ From the Julia REPL:
 
 ```julia
 using Pkg
-Pkg.add(url="https://github.com/uvegege/AnalyticEMModes.jl")
+Pkg.add(url="AnalyticEMModes")
 ```
 
 Or in package mode (type `]`):
 
 ```
-pkg> add https://github.com/uvegege/AnalyticEMModes.jl
+pkg> add AnalyticEMModes
 ```
 
 ## Overview
@@ -36,7 +36,7 @@ This package provides closed-form solutions for electric and magnetic field dist
 | Radial         | `radial`| (ρ, φ, z)      | Yes                 |
 | Wedge          | `wedge` | (ρ, φ, z)      | Yes                 |
 | Elliptical       | `ewg` | (ξ, η)           | No                  |
-| Spherical      | —     | (r, θ, φ)        | Under development   |
+| Spherical      | `sph` | (r, θ, φ)        | Yes                 |
 
 
 ## Features
@@ -137,7 +137,7 @@ Example comparison code is provided in the documentation for each geometry.
 ## Contributing
 
 Contributions are welcome! Areas for expansion:
-- Additional geometries (spherical, etc.) with analytical solutions.
+- Additional geometries (spheroidal, etc.) with analytical solutions.
 - Additional visualization utilities, like field line plotting.
 - And anything else you think might fit in AnalyticEMMode.jl
 
