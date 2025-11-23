@@ -8,7 +8,7 @@ From the Julia REPL:
 
 ```julia
 using Pkg
-Pkg.add(url="AnalyticEMModes")
+Pkg.add("AnalyticEMModes")
 ```
 
 Or in package mode (type `]`):
