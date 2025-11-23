@@ -15,8 +15,6 @@ With `lmax = 6` you have 49 **TE** modes.
 
 ```@example
 
-using StaticArrays
-
 lmax = 6
 R = 1
 name = "../Assets/mesh/sphregion.msh"
