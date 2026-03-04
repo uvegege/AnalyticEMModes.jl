@@ -300,3 +300,263 @@ function cart2elliptic(x, y, a, b)
     ξ = 1/2 * log(1 - 2*q + 2*sqrt(q^2-q))
     return ξ, η
 end
+
+
+
+"""
+    Av_Avp_from_kernels(m, q, coeff; even=true, Nη=4096)
+
+Compute the angular normalization integrals:
+
+    A_v  = ∫₀²π |V(η)|²    dη
+    A_vp = ∫₀²π |∂V/∂η|²  dη
+
+where `V(η)` is `ce_m(η; q)` (`even=true`) or `se_m(η; q)` (`even=false`), evaluated
+using the precomputed Fourier coefficients `coeff`.
+
+The integrals are computed via the **spectral (periodic) trapezoidal rule** with `Nη`
+uniformly-spaced points on [0, 2π). Because the angular Mathieu functions are
+C∞-smooth and 2π-periodic, the trapezoidal rule converges exponentially fast and is
+effectively equivalent to applying Parseval's theorem to the Fourier-series
+representation of the Mathieu functions. For `Nη ≥ 4096` the result is
+indistinguishable from machine-precision exact.
+
+# Arguments
+- `m`: Azimuthal mode index
+- `q`: Mathieu parameter q = (kc·ρ)²/4
+- `coeff`: Fourier coefficients from `mathieu_a_coeff` (even) or `mathieu_b_coeff` (odd)
+- `even`: `true` for `ce_m` (even), `false` for `se_m` (odd)
+- `Nη`: Number of quadrature points (default 4096)
+
+# Returns
+`(A_v, A_vp)` as a plain tuple.
+"""
+function Av_Avp_from_kernels(m::Int, q, coeff; even::Bool=true, Nη::Int=4096)
+    m = abs(m)
+
+    # se_0 ≡ 0
+    if !even && m == 0
+        return (0.0, 0.0)
+    end
+
+    kernel = even ? ce_kernel : se_kernel
+    Δη = 2π / Nη
+
+    Av = 0.0
+    Avp = 0.0
+
+    # trapecio periódico: suma uniforme sin endpoints duplicados
+    for j in 0:Nη-1
+        η = j * Δη
+        V, Vη = kernel(m, coeff, q, η)
+        Av  += abs2(V)
+        Avp += abs2(Vη)
+    end
+
+    Av  *= Δη
+    Avp *= Δη
+    return Av, Avp
+end
+
+
+elliptic_xi0(a,b) = acosh(a/sqrt(a^2 - b^2))
+
+"""
+    elliptic_modal_power_1d(a, b, m, q, coeff, kc, β, f, μᵣ, εᵣ;
+                                       pol=:TE, even=true,
+                                       Nη=4096, rtol=1e-10, atol=0.0, maxdepth=25)
+
+Time-averaged modal power P (W) for a mode with unit longitudinal amplitude, computed
+by integrating the Poynting vector over the elliptical waveguide cross-section.
+
+In elliptic coordinates (ξ, η), the cross-sectional Poynting integral factorizes into
+a product of independent 1D integrals:
+
+    P = (1/2) · (ω·σ·β / kc⁴) · (A_v · I_U′ + A_vp · I_U)
+
+where σ = μ for TE modes and σ = ε for TM modes, and
+
+    A_v  = ∫₀²π |V(η)|²    dη ,   A_vp = ∫₀²π |∂V/∂η|²  dη
+    I_U  = ∫₀^{ξ₀} |U(ξ)|² dξ ,   I_U′ = ∫₀^{ξ₀} |∂U/∂ξ|² dξ
+
+**Angular integrals (quasi-analytical):** `A_v` and `A_vp` are evaluated via the
+spectral trapezoidal rule applied to the Fourier-series representation of `ce_m`/`se_m`,
+which is equivalent to Parseval's theorem and achieves machine-precision accuracy for
+sufficiently large `Nη`.
+
+**Radial integrals (1D numerical):** `I_U` and `I_U′` involve the Modified Mathieu
+functions `Ce_m`/`Se_m` over ξ ∈ [0, ξ₀], where ξ₀ = acosh(a/√(a²−b²)). Unlike the
+Bessel-based case (where the Lommel integral provides a closed form), no analytic
+primitive is known for Modified Mathieu functions, so these are computed by adaptive
+Simpson quadrature.
+
+# Arguments
+- `a`, `b`: Semi-major and semi-minor axes
+- `m`: Azimuthal mode index
+- `q`: Mathieu parameter q = (kc·ρ)²/4
+- `coeff`: Fourier coefficients of the angular Mathieu function
+- `kc`: Cutoff wavenumber
+- `β`: Phase constant
+- `f`: Frequency in Hz
+- `μᵣ`: Relative permeability
+- `εᵣ`: Relative permittivity
+
+# Keyword Arguments
+- `pol`: `:TE` or `:TM` (default `:TE`)
+- `even`: `true` for even (c) modes, `false` for odd (s) modes (default `true`)
+- `Nη`: Number of angular quadrature points for `A_v`/`A_vp` (default 4096)
+- `rtol`, `atol`, `maxdepth`: Tolerance and depth for the adaptive radial Simpson integrator
+"""
+function elliptic_modal_power_1d(a, b, m::Int, q, coeff, kc, β, f, μᵣ, εᵣ;
+                                            pol=:TE, even::Bool=true,
+                                            Nη::Int=4096,
+                                            rtol=1e-10, atol=0.0, maxdepth=25)
+
+    ξ0 = elliptic_xi0(a,b)
+    _μₒ = 4π*1e-7
+    _εₒ = 8.8541878128e-12
+    ω = 2π*f
+    μ = μᵣ*_μₒ
+    ε = εᵣ*_εₒ
+
+    A_v, A_vp = Av_Avp_from_kernels(m, q, coeff; even=even, Nη=Nη)
+
+    radial = even ? Mce_kernel : Mse_kernel
+
+    fU(ξ) = begin
+        U, _ = radial(1, m, coeff, q, ξ)
+        abs2(U)
+    end
+    fUp(ξ) = begin
+        _, Uξ = radial(1, m, coeff, q, ξ)
+        abs2(Uξ)
+    end
+
+    Iu  = quad_asimpson(fU,  0.0, ξ0; rtol=rtol, atol=atol, maxdepth=maxdepth)
+    Iup = quad_asimpson(fUp, 0.0, ξ0; rtol=rtol, atol=atol, maxdepth=maxdepth)
+
+    I = A_v*Iup + A_vp*Iu
+
+    pref = pol == :TE ? (ω*μ*β)/(kc^4) :
+           pol == :TM ? (ω*ε*β)/(kc^4) :
+           error("pol must be :TE or :TM")
+
+    return 0.5 * pref * I
+end
+
+"""
+    te_normalization_ewg(a, b, m, even, kc, β, f, μᵣ, εᵣ; kwargs...)
+
+Normalization factor for TE modes in an elliptical waveguide to achieve unit power.
+
+Returns `√(2/P)`, where `P` is the time-averaged power computed by
+[`elliptic_modal_power_1d`]. The Mathieu parameter `q` and
+Fourier coefficients are derived internally from `kc`, `m`, and `even`.
+
+The power integral decomposes as:
+
+    P = (ωμβ / 2kc⁴) · (A_v · I_U′ + A_vp · I_U)
+
+- **Angular part** (`A_v`, `A_vp`): quasi-analytical via the spectral trapezoidal rule
+  on the Fourier-series of `ce_m`/`se_m` (Parseval-equivalent, see
+  [`Av_Avp_from_kernels`]).
+- **Radial part** (`I_U`, `I_U′`): 1D adaptive numerical integration of the Modified
+  Mathieu functions over ξ ∈ [0, ξ₀] (no closed-form Lommel analog exists).
+
+# Arguments
+- `a`, `b`: Semi-major and semi-minor axes
+- `m`: Azimuthal mode index
+- `even`: `true` for even (c) modes, `false` for odd (s) modes
+- `kc`: Cutoff wavenumber (e.g. from `kc_ewg`)
+- `β`: Phase constant (e.g. from `phase_constant`)
+- `f`: Frequency in Hz
+- `μᵣ`: Relative permeability
+- `εᵣ`: Relative permittivity
+
+# Keyword Arguments
+Forwarded to `elliptic_modal_power_1d` (`Nη`, `rtol`, `atol`, `maxdepth`).
+"""
+function te_normalization_ewg(a, b, m::Int, even::Bool, kc, β, f, μᵣ, εᵣ; kwargs...)
+    ρ = sqrt(a^2 - b^2)
+    q = (kc * ρ)^2 / 4
+    c = even ? MathieuCharA(m, q) : MathieuCharB(m, q)
+    coeff = even ? mathieu_a_coeff(m, q, c, 100) : mathieu_b_coeff(m, q, c, 100)
+    P = elliptic_modal_power_1d(a, b, m, q, coeff, kc, β, f, μᵣ, εᵣ;
+                                           pol=:TE, even=even, kwargs...)
+    return sqrt(2 / P)
+end
+
+"""
+    tm_normalization_ewg(a, b, m, even, kc, β, f, μᵣ, εᵣ; kwargs...)
+
+Normalization factor for TM modes in an elliptical waveguide to achieve unit power.
+
+Returns `√(2/P)`, where `P` is the time-averaged power computed by
+[`elliptic_modal_power_1d`]. The Mathieu parameter `q` and
+Fourier coefficients are derived internally from `kc`, `m`, and `even`.
+
+The power integral decomposes as:
+
+    P = (ωεβ / 2kc⁴) · (A_v · I_U′ + A_vp · I_U)
+
+- **Angular part** (`A_v`, `A_vp`): quasi-analytical via the spectral trapezoidal rule
+  on the Fourier-series of `ce_m`/`se_m` (Parseval-equivalent, see
+  [`Av_Avp_from_kernels`]).
+- **Radial part** (`I_U`, `I_U′`): 1D adaptive numerical integration of the Modified
+  Mathieu functions over ξ ∈ [0, ξ₀] (no closed-form Lommel analog exists).
+
+# Arguments
+- `a`, `b`: Semi-major and semi-minor axes
+- `m`: Azimuthal mode index
+- `even`: `true` for even (c) modes, `false` for odd (s) modes
+- `kc`: Cutoff wavenumber (e.g. from `kc_ewg`)
+- `β`: Phase constant (e.g. from `phase_constant`)
+- `f`: Frequency in Hz
+- `μᵣ`: Relative permeability
+- `εᵣ`: Relative permittivity
+
+# Keyword Arguments
+Forwarded to `elliptic_modal_power_1d` (`Nη`, `rtol`, `atol`, `maxdepth`).
+"""
+function tm_normalization_ewg(a, b, m::Int, even::Bool, kc, β, f, μᵣ, εᵣ; kwargs...)
+    ρ = sqrt(a^2 - b^2)
+    q = (kc * ρ)^2 / 4
+    c = even ? MathieuCharA(m, q) : MathieuCharB(m, q)
+    coeff = even ? mathieu_a_coeff(m, q, c, 100) : mathieu_b_coeff(m, q, c, 100)
+    P = elliptic_modal_power_1d(a, b, m, q, coeff, kc, β, f, μᵣ, εᵣ;
+                                           pol=:TM, even=even, kwargs...)
+    return sqrt(2 / P)
+end
+
+# --- Simpson adaptativo (compacto) ---
+@inline function _simpson(f, a, b)
+    c = (a + b)/2
+    h = b - a
+    (h/6) * (f(a) + 4*f(c) + f(b))
+end
+
+function _adapt_simpson(f, a, b, fa, fb, fc, S, tol, depth)
+    c  = (a + b)/2
+    d  = (a + c)/2
+    e  = (c + b)/2
+    fd = f(d)
+    fe = f(e)
+    Sleft  = (c - a)/6 * (fa + 4*fd + fc)
+    Sright = (b - c)/6 * (fc + 4*fe + fb)
+    S2 = Sleft + Sright
+    if depth <= 0 || abs(S2 - S) ≤ 15*tol
+        return S2 + (S2 - S)/15
+    end
+    return _adapt_simpson(f, a, c, fa, fc, fd, Sleft,  tol/2, depth-1) +
+           _adapt_simpson(f, c, b, fc, fb, fe, Sright, tol/2, depth-1)
+end
+
+function quad_asimpson(f, a, b; rtol=1e-10, atol=0.0, maxdepth=20)
+    fa = f(a)
+    fb = f(b)
+    c  = (a + b)/2
+    fc = f(c)
+    S  = (b - a)/6 * (fa + 4*fc + fb)
+    tol = max(atol, rtol*abs(S))
+    _adapt_simpson(f, a, b, fa, fb, fc, S, tol, maxdepth)
+end

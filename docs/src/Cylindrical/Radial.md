@@ -151,7 +151,7 @@ for (idplot, (m, n)) in enumerate(modekind)
     fields = te_wedge_fields(rcoords, ϕcoords, zcoords, H, ϕ0, m, n, 1.0, 0.0, 100e9, 1, 1)
     fz = getindex.(fields, 6)
     m1 = mesh!(axi, coord, connf, color = :gray)
-    m2 = mesh!(axi, coords, new_conn, color = real.(fz), colormap = :jet)
+    m2 = mesh!(axi, coords, new_conn, color = abs.(fz), colormap = :jet)
 end
 fig
 ```

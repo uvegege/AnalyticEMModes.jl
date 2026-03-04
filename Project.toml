@@ -6,6 +6,7 @@ version = "0.1.0"
 Bessels = "0e736298-9ec6-45e8-9647-e4fc86a2fe38"
 MathieuF = "1d5ea620-0e37-47ee-af2a-0a7cf7ec3863"
 SpheriCart = "5caf2b29-02d9-47a3-9434-5931c85ba645"
+SpheroidalWaveFunctions = "02c85723-9d49-4e80-ba06-d2f5c9d5147a"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [compat]
@@ -13,6 +14,7 @@ Bessels = "0.2.8"
 MathieuF = "0.1.5"
 julia = "1.10"
 SpheriCart = "0.2.3"
+SpheroidalWaveFunctions = "0.1.0"
 StaticArrays = "1.9.15"
 
 [extras]

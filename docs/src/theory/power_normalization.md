@@ -380,6 +380,62 @@ The same procedure and result applies to TM modes, replacing ``\mu`` by ``\varep
 
 
 
+## Elliptical Waveguide
+
+In elliptic coordinates ``(\xi, \eta)``, the longitudinal modal function separates as
+
+```math
+\psi(\xi, \eta) = U(\xi)\, V(\eta)
+```
+
+where ``U(\xi)`` is a Modified Mathieu function (``\text{Ce}_m`` or ``\text{Se}_m``) and
+``V(\eta)`` is an angular Mathieu function (``\text{ce}_m`` or ``\text{se}_m``).
+
+The metric factor ``h = \rho\sqrt{\sinh^2\xi + \sin^2\eta}`` (with ``\rho = \sqrt{a^2-b^2}``)
+appears in the Poynting integrand, but the cross-section integral still factorizes into
+independent 1D contributions:
+
+```math
+P = \frac{1}{2}\frac{\omega\sigma\beta}{k_c^4}
+    \Bigl( A_v \, I_{U'} + A_{v'} \, I_U \Bigr)
+```
+
+where ``\sigma = \mu`` for TE modes and ``\sigma = \varepsilon`` for TM modes, and
+
+```math
+A_v   = \int_0^{2\pi} |V(\eta)|^2 \, d\eta, \qquad
+A_{v'} = \int_0^{2\pi} \left|\frac{\partial V}{\partial\eta}\right|^2 d\eta
+```
+
+```math
+I_U   = \int_0^{\xi_0} |U(\xi)|^2 \, d\xi, \qquad
+I_{U'} = \int_0^{\xi_0} \left|\frac{\partial U}{\partial\xi}\right|^2 d\xi
+```
+
+with ``\xi_0 = \text{acosh}(a/\rho)`` being the coordinate of the elliptic boundary.
+
+### Angular integrals — analytical
+
+The angular Mathieu functions admit a Fourier series representation with coefficients
+``\{A_k\}`` (``a``-type for even modes) or ``\{B_k\}`` (``b``-type for odd modes).
+Parseval's theorem applied to these series yields ``A_v`` and ``A_{v'}`` exactly in
+terms of the coefficients alone, without any numerical quadrature.
+
+### Radial integrals — 1D numerical
+
+For Bessel-based waveguides, the analogous integrals ``\int \rho F^2 d\rho`` reduce to the
+Lommel identity and admit closed-form expressions. No such identity exists for the
+Modified Mathieu functions ``\text{Ce}_m`` and ``\text{Se}_m``, so ``I_U`` and ``I_{U'}``
+are evaluated by adaptive 1D quadrature over ``\xi \in [0,\xi_0]``.
+
+### Normalization constant
+
+The normalization factor follows the same expression as in the other waveguide types:
+
+```math
+F_0 = \sqrt{\frac{2}{P}}
+```
+
 ## Spherical Modes
 
 The Poynting vector in spherical coordinates has the radial component:

@@ -4,6 +4,7 @@ module AnalyticEMModes
     using MathieuF
     using SpheriCart
     using StaticArrays
+    using SpheroidalWaveFunctions
 
     include("./common.jl")
     
@@ -22,9 +23,10 @@ module AnalyticEMModes
     # Spherical Coordinates
     include("./spherical.jl")
 
+    # Spheroidal Coordinated
     # Sort modes
     include("./sortmodes.jl")
-
+    
 
     export wavenumber, phase_constant, attenuation_factor, propagation_constant
     export cutoff_frequency, mode_wavelength, mode_impedance
@@ -42,12 +44,13 @@ module AnalyticEMModes
     
     export kc_wedge, te_wedge_fields, tm_wedge_fields, te_normalization_wedge, tm_normalization_wedge
     
-    export kc_ewg, te_ewg_fields, tm_ewg_fields 
+    export kc_ewg, te_ewg_fields, tm_ewg_fields
+    export te_normalization_ewg, tm_normalization_ewg
     export cart2elliptic, metric_and_unit_elliptic, ce_m, se_m, Ce_m, Se_m
     
     export first_n_modes_rwg, first_n_modes_cwg, first_n_modes_coax, first_n_modes_radial, first_n_modes_ewg
 
     export kc_sph, te_sph_fields_lmax, tm_sph_fields_lmax, tm_sph_fields, te_sph_fields, te_normalization_sph, tm_normalization_sph
-    export first_n_modes_sph, spherical_to_cartesian_fields, to_svector3
+    export first_n_modes_sph, spherical_to_cartesian_fields, to_svector, mn_vectors_sph, mn_sph_vectors_lmax
+    
 end
-

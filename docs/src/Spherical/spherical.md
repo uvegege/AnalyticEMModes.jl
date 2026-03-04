@@ -26,7 +26,7 @@ xcoords = coords[1, :]
 ycoords = coords[2, :]
 zcoords = coords[3, :]
 #r_vec = [SVector(v...) for v in eachcol(coords)]
-r_vec = to_svector3(xcoords, ycoords, zcoords)
+r_vec = to_svector(xcoords, ycoords, zcoords)
 
 incident = false
 myfields = te_sph_fields_lmax(r_vec, lmax, 10e9, 1.0, 1.0, incident)
