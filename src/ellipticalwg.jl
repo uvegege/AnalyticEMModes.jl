@@ -339,7 +339,6 @@ function Av_Avp_from_kernels(m::Int, q, coeff; even::Bool=true, Nη::Int=4096)
         return (0.0, 0.0)
     end
 
-    kernel = even ? ce_kernel : se_kernel
     Δη = 2π / Nη
 
     Av = 0.0
@@ -348,7 +347,11 @@ function Av_Avp_from_kernels(m::Int, q, coeff; even::Bool=true, Nη::Int=4096)
     # trapecio periódico: suma uniforme sin endpoints duplicados
     for j in 0:Nη-1
         η = j * Δη
-        V, Vη = kernel(m, coeff, q, η)
+        if even
+            V, Vη = ce_kernel(m, coeff, q, η)
+        else
+            V, Vη = se_kernel(m, coeff, q, η)
+        end
         Av  += abs2(V)
         Avp += abs2(Vη)
     end
@@ -449,7 +452,7 @@ end
 
 Normalization factor for TE modes in an elliptical waveguide to achieve unit power.
 
-Returns `√(2/P)`, where `P` is the time-averaged power computed by
+Returns `√(1/P)`, where `P` is the time-averaged power computed by
 [`elliptic_modal_power_1d`]. The Mathieu parameter `q` and
 Fourier coefficients are derived internally from `kc`, `m`, and `even`.
 
@@ -483,7 +486,7 @@ function te_normalization_ewg(a, b, m::Int, even::Bool, kc, β, f, μᵣ, εᵣ;
     coeff = even ? mathieu_a_coeff(m, q, c, 100) : mathieu_b_coeff(m, q, c, 100)
     P = elliptic_modal_power_1d(a, b, m, q, coeff, kc, β, f, μᵣ, εᵣ;
                                            pol=:TE, even=even, kwargs...)
-    return sqrt(2 / P)
+    return sqrt(1 / P)
 end
 
 """
@@ -491,7 +494,7 @@ end
 
 Normalization factor for TM modes in an elliptical waveguide to achieve unit power.
 
-Returns `√(2/P)`, where `P` is the time-averaged power computed by
+Returns `√(1/P)`, where `P` is the time-averaged power computed by
 [`elliptic_modal_power_1d`]. The Mathieu parameter `q` and
 Fourier coefficients are derived internally from `kc`, `m`, and `even`.
 
@@ -525,7 +528,7 @@ function tm_normalization_ewg(a, b, m::Int, even::Bool, kc, β, f, μᵣ, εᵣ;
     coeff = even ? mathieu_a_coeff(m, q, c, 100) : mathieu_b_coeff(m, q, c, 100)
     P = elliptic_modal_power_1d(a, b, m, q, coeff, kc, β, f, μᵣ, εᵣ;
                                            pol=:TM, even=even, kwargs...)
-    return sqrt(2 / P)
+    return sqrt(1 / P)
 end
 
 # --- Simpson adaptativo (compacto) ---

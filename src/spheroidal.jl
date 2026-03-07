@@ -154,7 +154,9 @@ function _mn_spheroidal_vectors!(A, points, basis::SpheroidalBasis{I, T}, k;
 
     ηϕ = [(p[2], p[3]) for p in points]
     ξs = [p[1] for p in points]
+    ηs = [p[2] for p in points]
     ψ, ∇ψ = compute_angular_with_derivatives(basis, ηϕ)
+    Sm, dSm, d²Sm = compute_angular_derivatives(basis, ηs)
     Rm, dRm, d²Rm = _compute_radial(basis, ξs, radial)
 
     for midx in eachindex(basis.basis)
@@ -167,7 +169,7 @@ function _mn_spheroidal_vectors!(A, points, basis::SpheroidalBasis{I, T}, k;
             R   = Rm[pidx, midx]
             dR  = dRm[pidx, midx]
             d²R = d²Rm[pidx, midx]
-            S_r, dS_r, d²S_r = evaluate_angular(b, η)
+            S_r, dS_r, d²S_r = Sm[pidx, midx], dSm[pidx, midx], d²Sm[pidx, midx]
             Mξ, Mη, Mϕ = _eval_M(family, ξ, η, ϕ, S, dS, R, dR, b.m, d, even, sph_type)
             Nξ, Nη, Nϕ = _eval_N(family, ξ, η, ϕ, S_r, dS_r, d²S_r, R, dR, d²R, b.m, d, k, even, sph_oblate)
             A[pidx, midx] = (Mξ, Mη, Mϕ, Nξ, Nη, Nϕ)

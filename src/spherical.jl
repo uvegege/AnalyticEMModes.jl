@@ -112,7 +112,13 @@ function sph_modal_f(θ, φ, rs, ylm, ylm_p, k)
     return (ψ, ∂ψθ, ∂ψφ, ∂²ψᵣθ, ∂²ψᵣφ ,∂²ψᵣᵣ)
 end
 
-#TODO: move ω outside
+"""
+    te_sph_fields(r, θ, ϕ, rs, ylm, ylm_p, k, μᵣ, εᵣ)
+
+Compute TE spherical mode fields at a single point `(r, θ, ϕ)` given pre-computed radial
+data `rs = (R, R′, R″_k)`, spherical harmonic value `ylm`, its gradient `ylm_p`, and
+medium parameters. Returns `(Eᵣ, Eθ, Eϕ, Hᵣ, Hθ, Hϕ)`.
+"""
 function te_sph_fields(r, θ, ϕ, rs, ylm, ylm_p, k, μᵣ, εᵣ)
 
     μ = μᵣ * _μₒ
@@ -211,15 +217,6 @@ function _te_sph_fields_lmax!(A, Rs, r_vec, basis, lmax::Int, f, μᵣ, εᵣ, r
     return nothing
 end
 
-
-"""
-    te_sph_fields(r, θ, ϕ, rs, ylm, ylm_p, k, μᵣ, εᵣ)
-
-Compute TE spherical mode fields at a single point `(r, θ, ϕ)` given pre-computed radial
-data `rs = (R, R′, R″_k)`, spherical harmonic value `ylm`, its gradient `ylm_p`, and
-medium parameters. Returns `(Eᵣ, Eθ, Eϕ, Hᵣ, Hθ, Hϕ)`.
-"""
-function te_sph_fields end
 
 """
     tm_sph_fields(r, θ, ϕ, rs, ylm, ylm_p, k, μᵣ, εᵣ)

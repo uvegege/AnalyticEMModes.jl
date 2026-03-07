@@ -259,3 +259,37 @@ function sphregion_mesh(R1; dl = 1e-1, name = "./sphregion.msh")
     Gmsh.gmsh.finalize()
     #return model
 end
+
+function spheroidal_region_mesh(R1, R2; oblate = false, dl = 1e-1, name = "./sphregion.msh")
+
+    Gmsh.gmsh.initialize()
+    Gmsh.gmsh.option.setNumber("General.Terminal", 1)
+    Gmsh.gmsh.clear()
+    Gmsh.gmsh.model.add("ew")
+    # Prolate: semi-axes (R2, R2, R1). Oblate: semi-axes (R1, R1, R2).
+    if oblate
+        sph = Gmsh.gmsh.model.occ.add_sphere(0.0, 0.0, 0.0, R1)
+        Gmsh.gmsh.model.occ.dilate([(3, sph)], 0.0, 0.0, 0.0, 1.0, 1.0, R2 / R1)
+    else
+        sph = Gmsh.gmsh.model.occ.add_sphere(0.0, 0.0, 0.0, R2)
+        Gmsh.gmsh.model.occ.dilate([(3, sph)], 0.0, 0.0, 0.0, 1.0, 1.0, R1 / R2)
+    end
+    Gmsh.gmsh.model.occ.synchronize()
+
+    for (dim, tag) in Gmsh.gmsh.model.getEntities(0)
+        Gmsh.gmsh.model.mesh.setSize((dim, tag), dl)
+    end
+
+    
+    Gmsh.gmsh.model.addPhysicalGroup(2, getindex.(Gmsh.gmsh.model.getEntities(2), 2), 1, "Domain")
+
+    Gmsh.gmsh.model.occ.synchronize()
+    Gmsh.gmsh.model.mesh.generate(2)
+    Gmsh.gmsh.model.mesh.set_order(1)
+    Gmsh.gmsh.write(name)
+    Gmsh.gmsh.model.mesh.renumberNodes()
+    Gmsh.gmsh.model.mesh.renumberElements()
+    #model = GmshDiscreteModel(Gmsh.gmsh) # Gridap only
+    Gmsh.gmsh.finalize()
+    #return model
+end

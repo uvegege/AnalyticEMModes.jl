@@ -365,6 +365,54 @@ function evaluate_real(b::SpheroidalB{I, T, Complex{T}}, η, ϕ) where {I, T}
     return S * sm, S * dsm, dS * sm, S * cm, S * dcm, dS * cm
 end
 
+"""
+    compute_angular_derivatives(basis::SpheroidalBasis, r) -> (S, ∂S, ∂²S)
+
+Batch evaluation of the real angular spheroidal function and its first and second
+derivatives with respect to η, for all modes in `basis` and all points in `r`.
+
+`r` is a vector of η values. Returns three real matrices of size `(length(r), N)`,
+where `N = length(basis.basis)`.
+
+Use this when the ϕ-dependence is handled separately — in particular, to supply
+`S, ∂S, ∂²S` to the N vector functions, which require second derivatives.
+
+See also [`compute_angular_with_derivatives`](@ref) for the full complex mode function
+ψ = S(η)·e^{imϕ} with its (η, ϕ) gradient.
+"""
+function compute_angular_derivatives(basis::SpheroidalBasis{I, T}, r) where {I, T}
+    N = length(basis.basis)
+    S   = Matrix{T}(undef, length(r), N)
+    ∂S  = Matrix{T}(undef, length(r), N)
+    ∂²S = Matrix{T}(undef, length(r), N)
+    for b_idx in eachindex(basis.basis)
+        for r_idx in eachindex(r)
+            η = r[r_idx]
+            Sval, ∂Sval, ∂²Sval = evaluate_angular(basis.basis[b_idx], η)
+            S[r_idx, b_idx]   = Sval
+            ∂S[r_idx, b_idx]  = ∂Sval
+            ∂²S[r_idx, b_idx] = ∂²Sval
+        end
+    end
+    return S, ∂S, ∂²S
+end
+
+"""
+    compute_angular_with_derivatives(basis::SpheroidalBasis, r) -> (ψ, ∇ψ)
+
+Batch evaluation of the full complex mode function ψ = S(η)·e^{imϕ} and its angular
+gradient, for all modes in `basis` and all points in `r`.
+
+`r` is a vector of `(η, ϕ)` tuples. Returns:
+- `ψ`: complex matrix of size `(length(r), N)` with `ψ[i,j] = S(η)·e^{imϕ}`.
+- `∇ψ`: matrix of `SVector{2, Complex}` with `[∂ψ/∂η, ∂ψ/∂ϕ]` at each point.
+
+Use this for expansion matrices and boundary condition integrals where the full
+complex mode function is needed.
+
+See also [`compute_angular_derivatives`](@ref) for the real `S, ∂S, ∂²S` needed
+by the N vector functions.
+"""
 function compute_angular_with_derivatives(basis::SpheroidalBasis{I, T}, r) where {I, T}
     N = length(basis.basis)
     ψ  = Matrix{Complex{T}}(undef, length(r), N)
