@@ -89,3 +89,5 @@ Detailed examples for each geometry are organized in the following sections:
 * **[Radial and Wedge Waveguides](Cylindrical/Radial.md)**: Modes in radial waveguides and wedge structures
 * **[Elliptic Waveguides](Elliptic/elliptic.md)**: Modes using Mathieu functions
 * **[Rectangular Waveguides](Rectangular/rectangular.md)**: Analytical solutions in Cartesian coordinates
+* **[Spherical Modes](Spherical/spherical.md)**: Spherical vector waves and TE/TM utilities
+* **[Spheroidal Modes](Spheroidal/spheroidal.md)**: Prolate/oblate M-N vector families

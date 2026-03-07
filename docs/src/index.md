@@ -102,6 +102,8 @@ This documentation is organized as follows:
 - **[Radial & Wedge](Cylindrical/Radial.md)**: Radial propagation geometries
 - **[Rectangular Waveguides](Rectangular/rectangular.md)**: Standard rectangular guides
 - **[Elliptic Waveguides](Elliptic/elliptic.md)**: Mathieu function solutions
+- **[Spherical Modes](Spherical/spherical.md)**: Spherical vector waves and mode sets
+- **[Spheroidal Modes](Spheroidal/spheroidal.md)**: Prolate/oblate vector-wave families
 
 ### Theory (Recommended Reading)
 For users interested in the mathematical foundations:

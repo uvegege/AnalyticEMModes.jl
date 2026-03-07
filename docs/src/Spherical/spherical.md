@@ -72,3 +72,60 @@ ga = fig[ii, jj] = GridLayout()
 end
 fig
 ```
+
+## M/N Basis Visualization
+
+You can also visualize the raw spherical vector-wave basis directly.
+
+```@example
+lmax = 4
+f = 10e9
+μr, εr = 1.0, 1.0
+radial = 4
+name = "../Assets/mesh/sphregion.msh"
+
+coord, conn = mesh_data(name)
+coords = coord[:, 1:maximum(conn)]
+xcoords = coords[1, :]
+ycoords = coords[2, :]
+zcoords = coords[3, :]
+r_vec = to_svector(xcoords, ycoords, zcoords)
+
+mn = mn_sph_vectors_lmax(r_vec, lmax, f, μr, εr, radial)
+
+l, m = 3, 1
+idx = l^2 + l + m + 1
+mode = mn[:, idx]
+
+Mcart = map(mode, r_vec) do mi, ri
+    Mr, Mθ, Mϕ, Nr, Nθ, Nϕ = mi
+    _, θ, ϕ = cart2sph(ri...)
+    Ex, Ey, Ez, _, _, _ = spherical_to_cartesian_fields(Mr, Mθ, Mϕ, 0.0, 0.0, 0.0, θ, ϕ)
+    (Ex, Ey, Ez, Nr)
+end
+
+Mx = map(v -> real(v[1]), Mcart)
+My = map(v -> real(v[2]), Mcart)
+Mz = map(v -> real(v[3]), Mcart)
+Nr = map(v -> real(v[4]), Mcart)
+Mf = map((x, y, z) -> hypot(x, y, z), Mx, My, Mz)
+
+Mx ./= Mf
+My ./= Mf
+Mz ./= Mf
+
+fig = Figure(size = (900, 420))
+ga = fig[1, 1] = GridLayout()
+
+Label(ga[0, 1:2], L"M_{%$l,%$m}\ \mathrm{and}\ N_r", fontsize = 28, tellwidth = false)
+ax1 = LScene(ga[1, 1], show_axis = false)
+mesh!(ax1, coords, conn, color = :gray)
+arrows3d!(ax1, xcoords, ycoords, zcoords, 0.08 .* Mx, 0.08 .* My, 0.08 .* Mz, color = Mf, colormap = :turbo)
+
+ax2 = LScene(ga[1, 2], show_axis = false)
+mesh!(ax2, coords, conn, color = Nr, colormap = :balance)
+
+rotate_cam!(ax1.scene, Vec3f(0.0, 0.0, 0.0))
+rotate_cam!(ax2.scene, Vec3f(0.0, 0.0, 0.0))
+fig
+```

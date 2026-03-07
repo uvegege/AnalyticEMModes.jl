@@ -164,6 +164,42 @@ Eρ, Eφ, Ez, Hρ, Hφ, Hz = te_wedge_fields(r, ϕ, z, h, ϕ0, p, n, Amn, Bmn, f
 Eρ, Eφ, Ez, Hρ, Hφ, Hz = tm_wedge_fields(r, ϕ, z, h, ϕ0, p, n, Amn, Bmn, f, μᵣ, εᵣ)
 ```
 
+### Spherical Modes (`sph`)
+
+**Coordinates:** Spherical `(r, θ, ϕ)`
+
+**Functions (single mode and batched):**
+```julia
+fields_te = te_sph_fields_lmax(points_cart, lmax, f, μᵣ, εᵣ)
+fields_tm = tm_sph_fields_lmax(points_cart, lmax, f, μᵣ, εᵣ)
+
+mn = mn_sph_vectors_lmax(points_cart, lmax, f, μᵣ, εᵣ)
+```
+
+**Build TE/TM from M/N:**
+```julia
+Eᵣ,Eθ,Eϕ,Hᵣ,Hθ,Hϕ = te_from_mn_sph(r, θ, ϕ, rs, ylm, ylm_p, l, k, radial, μᵣ, εᵣ)
+Eᵣ,Eθ,Eϕ,Hᵣ,Hθ,Hϕ = tm_from_mn_sph(r, θ, ϕ, rs, ylm, ylm_p, l, k, radial, μᵣ, εᵣ)
+```
+
+### Spheroidal Modes (`spheroidal`)
+
+**Coordinates:** Local spheroidal `(ξ, η, ϕ)`, prolate/oblate.
+
+**Core vector functions:**
+```julia
+Mξ, Mη, Mϕ, Nξ, Nη, Nϕ = mn_spheroidal_vector(ξ, η, ϕ, mode, k; family=:z, even=true, radial=4)
+
+A = mn_spheroidal_vectors(points, basis, k; family=:z, even=true, radial=4)
+# A[p, i] = (Mξ, Mη, Mϕ, Nξ, Nη, Nϕ)
+```
+
+Where `basis` can be built with:
+```julia
+basis_pro = ProlateSpheroidalBasis(m_max, n_max, c)
+basis_obl = OblateSpheroidalBasis(m_max, n_max, complex(0.0, c))
+```
+
 
 ## Return Values
 
@@ -242,5 +278,7 @@ For detailed examples with visualizations, see:
 - [Radial & Wedge](Cylindrical/Radial.md)
 - [Rectangular Waveguides](Rectangular/rectangular.md)
 - [Elliptic Waveguides](Elliptic/elliptic.md)
+- [Spherical Modes](Spherical/spherical.md)
+- [Spheroidal Modes](Spheroidal/spheroidal.md)
 
 

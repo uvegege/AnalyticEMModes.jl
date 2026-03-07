@@ -21,7 +21,8 @@ makedocs(modules = [AnalyticEMModes],
                 "Radial & Wedge" => "Cylindrical/Radial.md",
             ],
             "Elliptic" => "Elliptic/elliptic.md",
-            "Spherical" => "Spherical/spherical.md"
+            "Spherical" => "Spherical/spherical.md",
+            "Spheroidal" => "Spheroidal/spheroidal.md"
         ],
         "Theory" => Any[
             "Introduction" => "theory/introduction.md",

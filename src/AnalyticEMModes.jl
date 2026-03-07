@@ -1,5 +1,6 @@
 module AnalyticEMModes
 
+
     using Bessels
     using MathieuF
     using SpheriCart
@@ -55,7 +56,8 @@ module AnalyticEMModes
     export first_n_modes_sph, spherical_to_cartesian_fields, to_svector
     export mn_vectors_sph, mn_sph_vectors_lmax, m_sph_vectors_lmax, n_sph_vectors_lmax
     export m_normalization_sph, n_normalization_sph, te_from_mn_sph, tm_from_mn_sph
-
+    export sph2cart
+    
     export mn_spheroidal_vector, m_spheroidal_vector, n_spheroidal_vector
     export mn_spheroidal_vectors, m_spheroidal_vectors, n_spheroidal_vectors
     export mn_spheroidal_vectors_mnmax

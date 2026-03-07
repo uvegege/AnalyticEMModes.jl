@@ -3,3 +3,6 @@ docs/site/
 docs/Manifest*
 Manifest*.toml
 *.py
+local_tests*
+spherical_example
+Examples/*
