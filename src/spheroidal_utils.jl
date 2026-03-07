@@ -19,14 +19,12 @@ end
 function cart2pro(a, x, y, z)
     ρ = sqrt(x^2 + y^2)
     ϕ = atan(y, x)
-    
-    r = sqrt(x^2 + y^2 + z^2)
-    ξ = 0.5 * (sqrt((r + a)^2 + z^2) + sqrt((r - a)^2 + z^2)) / a
-    η = z / (a * ξ)
-    
-    ξ = max(ξ, 1.0)  
-    η = clamp(η, -1.0, 1.0)  # η ∈ [-1, 1]
-    
+    r1 = sqrt(ρ^2 + (z - a)^2)
+    r2 = sqrt(ρ^2 + (z + a)^2)
+    ξ = (r1 + r2) / (2*a)
+    η = (r2 - r1) / (2*a)
+    ξ = max(ξ, 1.0)
+    η = clamp(η, -1.0, 1.0)
     return ξ, η, ϕ
 end
 
@@ -52,15 +50,15 @@ function spheroidal_parameter(major_axis, minor_axis)
 end
 
 function scale_factors_prolate(a, ξ, η)
-    hξ = a * sqrt((ξ^2 - 1) * (1 - η^2)) / sqrt(ξ^2 - η^2)
-    hη = a * sqrt((ξ^2 - 1) * (1 - η^2)) / sqrt(ξ^2 - η^2)
+    hξ = a * sqrt((ξ^2 - η^2) / (ξ^2 - 1))
+    hη = a * sqrt((ξ^2 - η^2) / (1 - η^2))
     hϕ = a * sqrt((ξ^2 - 1) * (1 - η^2))
     return hξ, hη, hϕ
 end
 
 function scale_factors_oblate(a, ξ, η)
-    hξ = a * sqrt((ξ^2 + 1) * (1 - η^2)) / sqrt(ξ^2 + η^2)
-    hη = a * sqrt((ξ^2 + 1) * (1 - η^2)) / sqrt(ξ^2 + η^2)
+    hξ = a * sqrt((ξ^2 + η^2) / (ξ^2 + 1))
+    hη = a * sqrt((ξ^2 + η^2) / (1 - η^2))
     hϕ = a * sqrt((ξ^2 + 1) * (1 - η^2))
     return hξ, hη, hϕ
 end
@@ -142,21 +140,22 @@ struct SpheroidalB{I, T, T2}
     λ::T
     dr::Vector{T}
     c2k::Vector{T}
-    function SpheroidalB(m, n, c)
-        m > n && throw(ArgumentError("n must be >= m"))
-        λ = SpheroidalWaveFunctions.cv_matrix(m, n, c)
-        dr = SpheroidalWaveFunctions.compute_dr2_mix(m ,n, c, λ)
-        c2k = SpheroidalWaveFunctions.compute_c2k(m, n, dr)
-        return new{I, T, T2}(m, n, c, λ, dr, c2k)
-    end
+end
+
+function SpheroidalB(m, n, c)
+    m > n && throw(ArgumentError("n must be >= m"))
+    λ = SpheroidalWaveFunctions.cv_matrix(m, n, c)
+    dr = SpheroidalWaveFunctions.compute_dr2_mix(m ,n, c, λ)
+    c2k = SpheroidalWaveFunctions.compute_c2k(m, n, dr)
+    return SpheroidalB(m, n, c, λ, dr, c2k)
 end
 
 
 # Functions, partial derivative and second partial derivative
 function evaluate_angular(b::SpheroidalB{I, T, T}, η) where {I, T}
     (; m, n, c, λ, dr, c2k) = b
-    S, ∂S = prolate_angular_ps(m, n, c, λ, c2k, ξ)
-    ∂²S = ((+2η*∂S - (λ - c^2*η^2 + m^2/(ξ^2 - 1))*S) / (1 - η^2))
+    S, ∂S = prolate_angular_ps(m, n, c, λ, c2k, η)
+    ∂²S = ((+2η*∂S - (λ - c^2*η^2 + m^2/(1 - η^2))*S) / (1 - η^2))
     return S, ∂S, ∂²S
 end
 
@@ -169,7 +168,7 @@ end
 
 function evaluate_radial1(b::SpheroidalB{I, T, T}, ξ) where {I, T}
     (; m, n, c, λ, dr, c2k) = b
-    R, ∂R = oblate_angular_ps(m, n, c, λ, dr, ξ)
+    R, ∂R = prolate_radial1(m, n, c, λ, dr, ξ)
     ∂²R = ((-2ξ*∂R + (λ - c^2*ξ^2 + m^2/(ξ^2 - 1))*R) / (ξ^2 - 1))
     return R, ∂R, ∂²R
 end
@@ -191,7 +190,7 @@ end
 
 function evaluate_radial2(b::SpheroidalB{I, T, Complex{T}}, ξ) where {I, T}
     (; m, n, c, λ, dr, c2k) = b
-    R, ∂R = oblate_radial2(m, n, c, λ, ξ)
+    R, ∂R = oblate_radial2(m, n, c, λ, dr, ξ)
     ξ = abs(ξ)
     ∂²R = ((-2ξ*∂R + (λ - c^2*ξ^2 - m^2/(ξ^2 + 1))*R) / (ξ^2 + 1))
     return R, ∂R, ∂²R
@@ -244,10 +243,10 @@ struct ProlateSpheroidalBasis{I, T} <: SpheroidalBasis{I, T}
     m_max::I
     n_max::I
     c::T
-    basis::Vector{SpheroidalB{I, T}}
-    function SpheroidalBasis(m_max, n_max, c)
+    basis::Vector{SpheroidalB{I, T, T}}
+    function ProlateSpheroidalBasis(m_max, n_max, c::T) where T
         basis = [SpheroidalB(mi, ni, c) for mi in 0:m_max for ni in mi:n_max]
-        return new(m_max, n_max, c, basis)
+        return new{typeof(m_max), T}(m_max, n_max, c, basis)
     end
 end
 
@@ -255,16 +254,12 @@ struct OblateSpheroidalBasis{I, T} <: SpheroidalBasis{I, T}
     m_max::I
     n_max::I
     c::Complex{T}
-    basis::Vector{SpheroidalB{I, T}}
-    function SpheroidalBasis(m_max, n_max, c)
+    basis::Vector{SpheroidalB{I, T, Complex{T}}}
+    function OblateSpheroidalBasis(m_max, n_max, c::Complex{T}) where T
         basis = [SpheroidalB(mi, ni, c) for mi in 0:m_max for ni in mi:n_max]
-        return new(m_max, n_max, c, basis)
+        return new{typeof(m_max), T}(m_max, n_max, c, basis)
     end
 end
-
-
-
-
 
 # Other things
 
@@ -284,7 +279,6 @@ function evaluate(b::SpheroidalB{I, T, Complex{T}}, η, ϕ) where {I, T}
     return S * A, S * dA, dS * A
 end
 
-
 function evaluate_real(b::SpheroidalB{I, T, T}, η, ϕ) where {I, T}
     (; m, n, c, λ, dr, c2k) = b
     S, dS = prolate_angular_ps(m, n, c, λ, c2k, η)
@@ -301,21 +295,14 @@ function evaluate_real(b::SpheroidalB{I, T, Complex{T}}, η, ϕ) where {I, T}
     return S * sm, S * dsm, dS * sm, S * cm, S * dcm, dS * cm
 end
 
-
 function compute_angular_with_derivatives(basis::SpheroidalBasis{I, T}, r) where {I, T}
-    m_max = basis.m_max
-    n_max = basis.n_max
-    m = m_max+1
-    n = n_max+1
-    N = m*n
-    b = basis
-    # idx = n_max * (m_idx - 1) + n_idx
+    N = length(basis.basis)
     ψ  = Matrix{Complex{T}}(undef, length(r), N)
     ∇ψ = Matrix{SVector{2, Complex{T}}}(undef, length(r), N)
-    for b_idx in eachindex(basis)
+    for b_idx in eachindex(basis.basis)
         for r_idx in eachindex(r)
             η, ϕ = r[r_idx]
-            v, ∂v∂η, ∂v∂ϕ  = evaluate(b[idx], η, ϕ)
+            v, ∂v∂η, ∂v∂ϕ = evaluate(basis.basis[b_idx], η, ϕ)
             ψ[r_idx, b_idx] = v
             ∇ψ[r_idx, b_idx] = SVector(∂v∂η, ∂v∂ϕ)
         end
@@ -324,87 +311,68 @@ function compute_angular_with_derivatives(basis::SpheroidalBasis{I, T}, r) where
 end
 
 function compute_radial1_with_derivatives(basis::SpheroidalBasis{I, T}, r) where {I, T}
-    m_max = basis.m_max
-    n_max = basis.n_max
-    m = m_max+1
-    n = n_max+1
-    N = m*n
-    b = basis
-    R  = Matrix{Complex{T}}(undef, length(r), N)
-    ∂R = Matrix{Complex{T}}(undef, length(r), N)
+    N = length(basis.basis)
+    R   = Matrix{Complex{T}}(undef, length(r), N)
+    ∂R  = Matrix{Complex{T}}(undef, length(r), N)
     ∂²R = Matrix{Complex{T}}(undef, length(r), N)
-    for b_idx in eachindex(basis)
+    for b_idx in eachindex(basis.basis)
         for r_idx in eachindex(r)
             ξ = r[r_idx]
-            r, ∂r, ∂²r  = evaluate_radial1(b[idx], ξ)
-            R[r_idx, b_idx] = v
-            ∂R[r_idx, b_idx] = ∂r
-            ∂²R[r_idx, b_idx] = ∂²r
+            Rval, ∂Rval, ∂²Rval = evaluate_radial1(basis.basis[b_idx], ξ)
+            R[r_idx, b_idx]   = Rval
+            ∂R[r_idx, b_idx]  = ∂Rval
+            ∂²R[r_idx, b_idx] = ∂²Rval
         end
     end
     return R, ∂R, ∂²R
 end
 
 function compute_radial2_with_derivatives(basis::SpheroidalBasis{I, T}, r) where {I, T}
-    m_max = basis.m_max
-    n_max = basis.n_max
-    m = m_max+1
-    n = n_max+1
-    N = m*n
-    b = basis
-    R  = Matrix{Complex{T}}(undef, length(r), N)
-    ∂R = Matrix{Complex{T}}(undef, length(r), N)
+    N = length(basis.basis)
+    R   = Matrix{Complex{T}}(undef, length(r), N)
+    ∂R  = Matrix{Complex{T}}(undef, length(r), N)
     ∂²R = Matrix{Complex{T}}(undef, length(r), N)
-    for b_idx in eachindex(basis)
+    for b_idx in eachindex(basis.basis)
         for r_idx in eachindex(r)
             ξ = r[r_idx]
-            r, ∂r, ∂²r  = evaluate_radial2(b[idx], ξ)
-            R[r_idx, b_idx] = v
-            ∂R[r_idx, b_idx] = ∂r
-            ∂²R[r_idx, b_idx] = ∂²r
+            Rval, ∂Rval, ∂²Rval = evaluate_radial2(basis.basis[b_idx], ξ)
+            R[r_idx, b_idx]   = Rval
+            ∂R[r_idx, b_idx]  = ∂Rval
+            ∂²R[r_idx, b_idx] = ∂²Rval
         end
     end
     return R, ∂R, ∂²R
 end
 
 function compute_radial3_with_derivatives(basis::SpheroidalBasis{I, T}, r) where {I, T}
-    m_max = basis.m_max
-    n_max = basis.n_max
-    m = m_max+1
-    n = n_max+1
-    N = m*n
-    b = basis
-    R  = Matrix{Complex{T}}(undef, length(r), N)
-    ∂R = Matrix{Complex{T}}(undef, length(r), N)
+    N = length(basis.basis)
+    R   = Matrix{Complex{T}}(undef, length(r), N)
+    ∂R  = Matrix{Complex{T}}(undef, length(r), N)
     ∂²R = Matrix{Complex{T}}(undef, length(r), N)
-    for b_idx in eachindex(basis)
+    for b_idx in eachindex(basis.basis)
         for r_idx in eachindex(r)
             ξ = r[r_idx]
-            r, ∂r, ∂²r  = evaluate_radial3(b[idx], ξ)
-            R[r_idx, b_idx] = v
-            ∂R[r_idx, b_idx] = ∂r
-            ∂²R[r_idx, b_idx] = ∂²r
+            Rval, ∂Rval, ∂²Rval = evaluate_radial3(basis.basis[b_idx], ξ)
+            R[r_idx, b_idx]   = Rval
+            ∂R[r_idx, b_idx]  = ∂Rval
+            ∂²R[r_idx, b_idx] = ∂²Rval
         end
     end
     return R, ∂R, ∂²R
 end
+
 function compute_radial4_with_derivatives(basis::SpheroidalBasis{I, T}, r) where {I, T}
-    m_max = basis.m_max
-    n_max = basis.n_max
-    m = m_max+1
-    n = n_max+1
-    N = m*n
-    b = basis
-    R  = Matrix{Complex{T}}(undef, length(r), N)
-    ∂R = Matrix{Complex{T}}(undef, length(r), N)
+    N = length(basis.basis)
+    R   = Matrix{Complex{T}}(undef, length(r), N)
+    ∂R  = Matrix{Complex{T}}(undef, length(r), N)
     ∂²R = Matrix{Complex{T}}(undef, length(r), N)
-    for b_idx in eachindex(basis)
+    for b_idx in eachindex(basis.basis)
         for r_idx in eachindex(r)
             ξ = r[r_idx]
-            r, ∂r, ∂²r  = evaluate_radial4(b[idx], ξ)
-            R[r_idx, b_idx] = v
-            ∂R[r_idx, b_idx] = ∂r
-            ∂²R[r_idx, b_idx] = ∂²r
+            Rval, ∂Rval, ∂²Rval = evaluate_radial4(basis.basis[b_idx], ξ)
+            R[r_idx, b_idx]   = Rval
+            ∂R[r_idx, b_idx]  = ∂Rval
+            ∂²R[r_idx, b_idx] = ∂²Rval
         end
     end
     return R, ∂R, ∂²R
