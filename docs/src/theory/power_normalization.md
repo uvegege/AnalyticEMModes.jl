@@ -438,35 +438,49 @@ F_0 = \sqrt{\frac{2}{P}}
 
 ## Spherical Modes
 
-The Poynting vector in spherical coordinates has the radial component:
+For spherical modes, the implemented power normalization uses the radial complex
+Poynting component integrated on a sphere:
 
 ```math
-S_r = (\mathbf{E} \times \mathbf{H}^*) \cdot \hat{\mathbf{r}} = E_\theta H_\phi^* - E_\phi H_\theta^*
+S_r = \frac{1}{2}\Re\!\left(E_\theta H_\phi^* - E_\phi H_\theta^*\right)
 ```
 
-The angular integrals are:
+With the spherical-harmonic angular identities:
 
 ```math
 \oint |Y_{lm}|^2 d\Omega = 1,\quad \oint |\nabla_\perp Y_{lm}|^2 d\Omega = l(l+1)
 ```
 
-The radiated power can be expressed as:
+and radial function ``R`` (``h_l^{(1)}`` or ``h_l^{(2)}``) with derivative ``R'``,
+the implemented unnormalized powers are:
 
 ```math
-P \propto \frac{r^2}{2\omega\mu\varepsilon^2} \Re\left[i R_l(kr) R_l'(kr)^*\right] l(l+1)
+P_{\mathrm{TE,raw}} =
+\left|\frac{\Im\!\left(R\,R'^*\right)}{2\,\omega\,\mu\,\varepsilon^2}\,l(l+1)\right|
 ```
-
-with ``R_l(kr) = h_l^{(1)}(kr)`` or ``h_l^{(2)}(kr)``  for incoming or outgoing waves, respectively.
 
 ```math
-P = \left| \frac{k r^2}{2\omega\mu\varepsilon^2} \Re\left[i R R'\right] l(l+1) \right|
+P_{\mathrm{TM,raw}} =
+\left|\frac{\Im\!\left(R\,R'^*\right)}{2\,\omega\,\mu^2\,\varepsilon}\,l(l+1)\right|
 ```
 
-The normalization factor for 1W power is:
+Therefore, the package uses:
 
 ```math
-F_0 = \sqrt\frac{1}{P}
+F_{0,\mathrm{TE}}=\sqrt{\frac{1}{P_{\mathrm{TE,raw}}}},\qquad
+F_{0,\mathrm{TM}}=\sqrt{\frac{1}{P_{\mathrm{TM,raw}}}}
 ```
 
+which match [`te_normalization_sph`](@ref) and [`tm_normalization_sph`](@ref).
+
+### Note on M/N basis normalization
+
+[`m_normalization_sph`](@ref) and [`n_normalization_sph`](@ref) are **basis**
+normalizations for spherical vector waves ``M`` and ``N``.
+
+- `m_normalization_sph`: sets surface ``L^2`` scale of ``M``.
+- `n_normalization_sph`: sets the complementary ``M-N`` bilinear flux scaling.
+
+They are not standalone TE/TM unit-power normalizations.
 
 

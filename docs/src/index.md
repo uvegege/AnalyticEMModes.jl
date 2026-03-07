@@ -37,7 +37,7 @@ This package provides closed-form solutions for electric and magnetic field dist
 | Wedge          | `wedge` | (ρ, φ, z)      | Yes                 |
 | Elliptical       | `ewg` | (ξ, η)           | Yes                  |
 | Spherical      | `sph` | (r, θ, φ)        | Yes                 |
-| Spheroidal      | `spheroidal` | (ξ, η, φ)        | Yes                 |
+| Spheroidal      | `spheroidal` | (ξ, η, φ)        | No                 |
 
 
 ## Features
@@ -140,7 +140,7 @@ Example comparison code is provided in the documentation for each geometry.
 ## Contributing
 
 Contributions are welcome! Areas for expansion:
-- Additional geometries (spheroidal, etc.) with analytical solutions.
+- Additional geometries with analytical solutions.
 - Additional visualization utilities, like field line plotting.
 - And anything else you think might fit in AnalyticEMMode.jl
 
