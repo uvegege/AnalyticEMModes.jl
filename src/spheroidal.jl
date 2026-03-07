@@ -1,7 +1,10 @@
 include("./spheroidal_utils.jl")
 include("./spheroidal_vectors.jl")
 
-# High-level API over hardcoded spheroidal vector families.
+
+kc_spheroidal() = 0.0
+
+spheroidal_families() = (:x, :y, :z, :r)
 
 @inline _is_oblate_basis(::SpheroidalB{I, T, T}) where {I, T} = false
 @inline _is_oblate_basis(::SpheroidalB{I, T, Complex{T}}) where {I, T} = true

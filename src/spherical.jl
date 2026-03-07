@@ -420,7 +420,7 @@ function tm_normalization_sph(l, r, k, radial::Int, μᵣ, εᵣ)
     c = 1 / sqrt(μ * ε)
     ω = k * c
     R, Rp, _ = radial == 3 ? sph_h1m_with_derivatives(l, r, k) : sph_h2m_with_derivatives(l, r, k)
-    P_unnormalized = abs( (k * r^2)/(2 * ω * μ^2 * ε) * real(im * R * Rp) * l * (l+1))
+    P_unnormalized = abs( imag(R * conj(Rp)) / (2 * ω * μ^2 * ε) * l * (l+1))
     norm_factor = sqrt(1 / P_unnormalized)
     return norm_factor
 end
@@ -447,7 +447,7 @@ function te_normalization_sph(l, r, k, radial::Int, μᵣ, εᵣ)
     c = 1 / sqrt(μ * ε)
     ω = k * c
     R, Rp, _ = radial == 3 ? sph_h1m_with_derivatives(l, r, k) : sph_h2m_with_derivatives(l, r, k)
-    P_unnormalized = abs( (k * r^2)/(2 * ω * μ * ε^2) * real(im * R * Rp) * l * (l+1))
+    P_unnormalized = abs( imag(R * conj(Rp)) / (2 * ω * μ * ε^2) * l * (l+1))
     norm_factor = sqrt(1 / P_unnormalized)
     return norm_factor
 end
@@ -456,7 +456,25 @@ end
 """
     m_normalization_sph(l, r, k, radial, μᵣ, εᵣ)
 
-Normalization factor for **M** spherical wave vectors to achieve unit power.
+**Basis normalization**, not power normalization.
+
+Normalization factor for the spherical vector wave function **Mₗₘ**
+based on surface L² normalization on a sphere:
+
+    ∫ |Mₗₘ|² dA = 1
+
+after scaling by this factor.
+
+This normalization only fixes the amplitude of **M** as a basis function.
+It does **not** correspond to unit electromagnetic power.
+
+In the spherical vector-wave-function formalism, physical power is associated
+with the bilinear flux pairing between **M** and **N**:
+
+    P ∝ ∫ Im{ Mₜ × Nₜ* } · r̂ dA
+
+The complementary scaling between **M** and **N** is therefore set through
+[`n_normalization_sph`](@ref), which fixes the M–N flux normalization.
 
 # Arguments
 - `l`: degree of the mode.
@@ -468,15 +486,43 @@ Normalization factor for **M** spherical wave vectors to achieve unit power.
 """
 function m_normalization_sph(l, r, k, radial::Int, μᵣ, εᵣ)
     R, _, _ = radial == 3 ? sph_h1m_with_derivatives(l, r, k) : sph_h2m_with_derivatives(l, r, k)
-    norm_factor = sqrt(1 / ((l*(l+1)) * 1/r^2 * abs2(R)))
+    norm_factor = sqrt(1 / (l*(l+1) * abs2(R)))
     return norm_factor
 end
 
 """
     n_normalization_sph(l, r, k, radial, μᵣ, εᵣ)
 
-Normalization factor for **N** spherical wave vectors to achieve unit power.
-Equivalent to `tm_normalization_sph`.
+**Basis normalization**, not power normalization.
+
+Normalization factor for the spherical vector wave function **Nₗₘ**
+defined so that, together with the scaling returned by
+[`m_normalization_sph`](@ref), the bilinear M–N flux pairing on a sphere is
+unit-normalized.
+
+This function does **not** normalize **N** independently in an `L²` sense.
+Instead, it fixes the relative scaling between **M** and **N** through the
+radial flux invariant:
+
+    ∫ 1/2 * Im{ Mₜ × Nₜ* } · r̂ dA = 1
+
+after applying both normalization factors.
+
+In practice:
+
+- [`m_normalization_sph`](@ref) first fixes the amplitude of **M** through a
+  surface `L²` normalization (`∫ |M|² dA = 1`);
+- `n_normalization_sph` then determines the complementary scaling of **N**
+  so that the bilinear M–N pairing becomes unitary.
+
+Therefore, this normalization **depends on the convention used for**
+[`m_normalization_sph`](@ref). The two functions must be used together.
+
+This is a **basis normalization convention** for the spherical
+vector-wave-function formalism. It is **not** equivalent to unit
+electromagnetic power normalization of a physical TE/TM mode.
+
+For physical unit-power scaling, use the TE/TM normalization functions instead.
 
 # Arguments
 - `l`: degree of the mode.
@@ -487,8 +533,14 @@ Equivalent to `tm_normalization_sph`.
 - `εᵣ`: relative permittivity.
 """
 function n_normalization_sph(l, r, k, radial::Int, μᵣ, εᵣ)
-    return tm_normalization_sph(l, r, k, radial, μᵣ, εᵣ)
+    R, Rp, _ = radial == 3 ? sph_h1m_with_derivatives(l, r, k) : sph_h2m_with_derivatives(l, r, k)
+    Nm = m_normalization_sph(l, r, k, radial, μᵣ, εᵣ)
+    Pmn_unnormalized = abs(imag(R * conj(Rp)) / (2 * k) * l * (l+1))
+    norm_factor = 1 / (Pmn_unnormalized * Nm)
+    return norm_factor
 end
+
+
 
 """
     mn_vectors_sph(r, θ, ϕ, rs, ylm, ylm_p, k, μᵣ, εᵣ)
@@ -507,6 +559,65 @@ function mn_vectors_sph(r, θ, ϕ, rs, ylm, ylm_p, k, μᵣ, εᵣ)
     nφ = 1/k * ∂²ψᵣθ
 
     return (mr, mθ, mφ, nr, nθ, nφ)
+end
+
+"""
+    te_from_mn_sph(r, θ, ϕ, rs, ylm, ylm_p, l, k, radial, μᵣ, εᵣ; normalize=true)
+
+Build TE spherical fields from the `M/N` vector basis and return
+`(Eᵣ, Eθ, Eϕ, Hᵣ, Hθ, Hϕ)`.
+
+When `normalize=true` (default), fields are scaled with
+[`te_normalization_sph`](@ref) to unit power.
+"""
+function te_from_mn_sph(r, θ, ϕ, rs, ylm, ylm_p, l, k, radial::Int, μᵣ, εᵣ; normalize::Bool = true)
+    μ = μᵣ * _μₒ
+    ε = εᵣ * _εₒ
+    ω = k / sqrt(μ * ε)
+
+    Mᵣ, Mθ, Mϕ, Nᵣ, Nθ, Nϕ = mn_vectors_sph(r, θ, ϕ, rs, ylm, ylm_p, k, μᵣ, εᵣ)
+
+    # Match the same component convention already used by `te_sph_fields`.
+    Eᵣ = zero(Mᵣ)
+    Eθ = -1/ε * Mϕ
+    Eϕ = -1/ε * Mθ
+
+    sN = k / (im * ω * μ * ε)
+    Hᵣ = sN * Nᵣ
+    Hθ = sN * Nϕ
+    Hϕ = sN * Nθ
+
+    A = normalize ? te_normalization_sph(l, r, k, radial, μᵣ, εᵣ) : 1.0
+    return (A * Eᵣ, A * Eθ, A * Eϕ, A * Hᵣ, A * Hθ, A * Hϕ)
+end
+
+"""
+    tm_from_mn_sph(r, θ, ϕ, rs, ylm, ylm_p, l, k, radial, μᵣ, εᵣ; normalize=true)
+
+Build TM spherical fields from the `M/N` vector basis and return
+`(Eᵣ, Eθ, Eϕ, Hᵣ, Hθ, Hϕ)`.
+
+When `normalize=true` (default), fields are scaled with
+[`tm_normalization_sph`](@ref) to unit power.
+"""
+function tm_from_mn_sph(r, θ, ϕ, rs, ylm, ylm_p, l, k, radial::Int, μᵣ, εᵣ; normalize::Bool = true)
+    μ = μᵣ * _μₒ
+    ε = εᵣ * _εₒ
+    ω = k / sqrt(μ * ε)
+
+    Mᵣ, Mθ, Mϕ, Nᵣ, Nθ, Nϕ = mn_vectors_sph(r, θ, ϕ, rs, ylm, ylm_p, k, μᵣ, εᵣ)
+
+    sN = k / (im * ω * μ * ε)
+    Eᵣ = sN * Nᵣ
+    Eθ = sN * Nϕ
+    Eϕ = sN * Nθ
+
+    Hᵣ = zero(Mᵣ)
+    Hθ = 1/μ * Mϕ
+    Hϕ = 1/μ * Mθ
+
+    A = normalize ? tm_normalization_sph(l, r, k, radial, μᵣ, εᵣ) : 1.0
+    return (A * Eᵣ, A * Eθ, A * Eϕ, A * Hᵣ, A * Hθ, A * Hϕ)
 end
 
 

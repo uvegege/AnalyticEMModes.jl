@@ -11,6 +11,24 @@ function spheroidal_scale_factors(a, ξ, η; oblate::Bool = false)
     return scale_factors_prolate(a, ξ, η)
 end
 
+@inline function _spheroidal_surface_jacobian_xi(a, ξ, η; oblate::Bool = false)
+    if oblate
+        return a^2 * sqrt((ξ^2 + η^2) * (ξ^2 + 1))
+    end
+    return a^2 * sqrt((ξ^2 - η^2) * (ξ^2 - 1))
+end
+
+@inline function _safe_eta(η::Real)
+    # Avoid endpoint singular evaluations (η = ±1) while preserving symmetry.
+    ηtol = 1e-8
+    if η <= -1.0
+        return -1.0 + ηtol
+    elseif η >= 1.0
+        return 1.0 - ηtol
+    end
+    return clamp(η, -1.0 + ηtol, 1.0 - ηtol)
+end
+
 @inline function _trapz_periodic(vals, Δ)
     return Δ * sum(vals)
 end
@@ -44,20 +62,24 @@ function spheroidal_power_on_xi_surface(Efun, Hfun, a, ξ0;
     Nη < 2 && throw(ArgumentError("Nη must be >= 2"))
     Nϕ < 2 && throw(ArgumentError("Nϕ must be >= 2"))
 
-    ηs = range(-1.0, 1.0; length = Nη)
+    # Open interval in η to avoid pole singular evaluations at η=±1.
+    # Keep points a resolution-scaled distance away from poles.
+    ηedge = max(1e-8, 2.0 / (Nη + 1))
+    ηs = range(-1.0 + ηedge, 1.0 - ηedge; length = Nη)
     ϕs = range(0.0, 2π; length = Nϕ + 1)[1:end-1]
     Δη = step(ηs)
     Δϕ = 2π / Nϕ
 
     total = 0.0
     for η in ηs
-        _, hη, hϕ = spheroidal_scale_factors(a, ξ0, η; oblate = oblate)
+        ηe = _safe_eta(η)
+        Jη = _spheroidal_surface_jacobian_xi(a, ξ0, ηe; oblate = oblate)
         row = 0.0
         for ϕ in ϕs
-            _, Eη, Eϕ = Efun(η, ϕ)
-            _, Hη, Hϕ = Hfun(η, ϕ)
+            _, Eη, Eϕ = Efun(ηe, ϕ)
+            _, Hη, Hϕ = Hfun(ηe, ϕ)
             Sξ = spheroidal_power_density_xi(Eη, Eϕ, Hη, Hϕ)
-            row += Sξ * hη * hϕ
+            row += Sξ * Jη
         end
         total += row * Δϕ
     end
@@ -132,6 +154,7 @@ is computed by [`spheroidal_mn_power_on_xi_surface`](@ref).
 function spheroidal_mn_normalization_on_xi_surface(mode::SpheroidalB, k, ξ0;
                                                    target::Real = 1.0, kwargs...)
     P = spheroidal_mn_power_on_xi_surface(mode, k, ξ0; kwargs...)
+    isfinite(abs(P)) || throw(ArgumentError("Computed power is not finite; cannot normalize."))
     abs(P) == 0 && throw(ArgumentError("Computed power is zero; cannot normalize."))
     return sqrt(target / abs(P))
 end
@@ -177,34 +200,56 @@ function spheroidal_power_eta_kernel(mode::SpheroidalB, k, ξ0, η;
                                      H_from::Symbol = :N,
                                      Nϕ = nothing)
     a = abs(mode.c / k)
-    _, hη, hϕ = spheroidal_scale_factors(a, ξ0, η; oblate = oblate)
     nphi = isnothing(Nϕ) ? _recommended_nphi(mode.m) : Int(Nϕ)
     nphi < 4 && throw(ArgumentError("Nϕ must be >= 4"))
-
     ϕs = range(0.0, 2π; length = nphi + 1)[1:end-1]
     Δϕ = 2π / nphi
-    acc = 0.0
-    for ϕ in ϕs
-        Mξ, Mη, Mϕ, Nξ, Nη, Nϕ = mn_spheroidal_vector(ξ0, η, ϕ, mode, k;
-                                                      family = family, even = even,
-                                                      oblate = oblate, radial = radial)
-        Eξ, Eη, Eϕ = if E_from == :M
-            (CE * Mξ, CE * Mη, CE * Mϕ)
-        elseif E_from == :N
-            (CE * Nξ, CE * Nη, CE * Nϕ)
-        else
-            throw(ArgumentError("E_from must be :M or :N"))
+    eval_at = function (ηloc)
+        ηe = _safe_eta(ηloc)
+        Jη = _spheroidal_surface_jacobian_xi(a, ξ0, ηe; oblate = oblate)
+        acc = 0.0
+        nvalid = 0
+        for ϕ in ϕs
+            Mξ, Mη, Mϕ, Nξ, Nη, Nϕ = mn_spheroidal_vector(ξ0, ηe, ϕ, mode, k;
+                                                          family = family, even = even,
+                                                          oblate = oblate, radial = radial)
+            Eξ, Eη, Eϕ = if E_from == :M
+                (CE * Mξ, CE * Mη, CE * Mϕ)
+            elseif E_from == :N
+                (CE * Nξ, CE * Nη, CE * Nϕ)
+            else
+                throw(ArgumentError("E_from must be :M or :N"))
+            end
+            Hξ, Hη, Hϕ = if H_from == :M
+                (CH * Mξ, CH * Mη, CH * Mϕ)
+            elseif H_from == :N
+                (CH * Nξ, CH * Nη, CH * Nϕ)
+            else
+                throw(ArgumentError("H_from must be :M or :N"))
+            end
+            s = spheroidal_power_density_xi(Eη, Eϕ, Hη, Hϕ)
+            if isfinite(s)
+                acc += s
+                nvalid += 1
+            end
         end
-        Hξ, Hη, Hϕ = if H_from == :M
-            (CH * Mξ, CH * Mη, CH * Mϕ)
-        elseif H_from == :N
-            (CH * Nξ, CH * Nη, CH * Nϕ)
-        else
-            throw(ArgumentError("H_from must be :M or :N"))
-        end
-        acc += spheroidal_power_density_xi(Eη, Eϕ, Hη, Hϕ)
+        nvalid == 0 && return NaN
+        # If a few phi samples are non-finite, preserve trapezoidal scaling.
+        val = acc * (nphi / nvalid) * Δϕ * Jη
+        return isfinite(val) ? val : NaN
     end
-    return acc * Δϕ * hη * hϕ
+
+    vals = Float64[]
+    for δη in (0.0, 1e-3, -1e-3, 5e-3, -5e-3, 1e-2, -1e-2, 2e-2, -2e-2, 5e-2, -5e-2)
+        v = eval_at(η + δη)
+        if isfinite(v)
+            push!(vals, v)
+        end
+    end
+    if !isempty(vals)
+        return sum(vals) / length(vals)
+    end
+    return NaN
 end
 
 """
@@ -232,16 +277,26 @@ function spheroidal_mn_power_on_xi_surface_1d(mode::SpheroidalB, k, ξ0;
                                               Nϕ = nothing)
     Nη < 3 && throw(ArgumentError("Nη must be >= 3"))
     iseven(Nη) && throw(ArgumentError("Nη must be odd for Simpson integration"))
-    ηs = range(-1.0, 1.0; length = Nη)
+    # Open interval in η to avoid pole singular evaluations at η=±1.
+    # Keep points a resolution-scaled distance away from poles.
+    ηedge = max(1e-8, 2.0 / (Nη + 1))
+    ηs = range(-1.0 + ηedge, 1.0 - ηedge; length = Nη)
     Δη = step(ηs)
 
     K = similar(collect(ηs))
     for i in eachindex(ηs)
         η = ηs[i]
-        K[i] = spheroidal_power_eta_kernel(mode, k, ξ0, η;
-                                           family = family, even = even, oblate = oblate,
-                                           radial = radial, CE = CE, CH = CH,
-                                           E_from = E_from, H_from = H_from, Nϕ = Nϕ)
+        Ki = spheroidal_power_eta_kernel(mode, k, ξ0, η;
+                                         family = family, even = even, oblate = oblate,
+                                         radial = radial, CE = CE, CH = CH,
+                                         E_from = E_from, H_from = H_from, Nϕ = Nϕ)
+        if isfinite(Ki)
+            K[i] = Ki
+        elseif i > 1 && isfinite(K[i-1])
+            K[i] = K[i-1]
+        else
+            K[i] = 0.0
+        end
     end
     return _simpson_uniform(K, Δη)
 end
@@ -256,6 +311,7 @@ returns `A` such that `|A|^2*P = target`.
 function spheroidal_mn_normalization_on_xi_surface_1d(mode::SpheroidalB, k, ξ0;
                                                       target::Real = 1.0, kwargs...)
     P = spheroidal_mn_power_on_xi_surface_1d(mode, k, ξ0; kwargs...)
+    isfinite(abs(P)) || throw(ArgumentError("Computed power is not finite; cannot normalize."))
     abs(P) == 0 && throw(ArgumentError("Computed power is zero; cannot normalize."))
     return sqrt(target / abs(P))
 end
@@ -283,7 +339,8 @@ function spheroidal_power_eta_kernels(mode::SpheroidalB, k, ξ0, η;
                                       radial::Int = 4,
                                       Nϕ = nothing)
     a = abs(mode.c / k)
-    _, hη, hϕ = spheroidal_scale_factors(a, ξ0, η; oblate = oblate)
+    ηe = _safe_eta(η)
+    Jη = _spheroidal_surface_jacobian_xi(a, ξ0, ηe; oblate = oblate)
     nphi = isnothing(Nϕ) ? _recommended_nphi(mode.m) : Int(Nϕ)
     nphi < 4 && throw(ArgumentError("Nϕ must be >= 4"))
     ϕs = range(0.0, 2π; length = nphi + 1)[1:end-1]
@@ -295,7 +352,7 @@ function spheroidal_power_eta_kernels(mode::SpheroidalB, k, ξ0, η;
     JNN = 0.0 + 0.0im
 
     for ϕ in ϕs
-        Mξ, Mη, Mϕ, Nξ, Nη, Nϕ = mn_spheroidal_vector(ξ0, η, ϕ, mode, k;
+        Mξ, Mη, Mϕ, Nξ, Nη, Nϕ = mn_spheroidal_vector(ξ0, ηe, ϕ, mode, k;
                                                       family = family, even = even,
                                                       oblate = oblate, radial = radial)
         JMM += (Mη * conj(Mϕ) - Mϕ * conj(Mη))
@@ -304,7 +361,7 @@ function spheroidal_power_eta_kernels(mode::SpheroidalB, k, ξ0, η;
         JNN += (Nη * conj(Nϕ) - Nϕ * conj(Nη))
     end
 
-    scale = Δϕ * hη * hϕ
+    scale = Δϕ * Jη
     return (JMM = JMM * scale, JMN = JMN * scale, JNM = JNM * scale, JNN = JNN * scale)
 end
 

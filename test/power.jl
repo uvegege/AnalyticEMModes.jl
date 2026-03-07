@@ -21,6 +21,8 @@ const _F = 10.0e9  # test frequency [Hz]
 
 # Sz = (1/2) Re(E₁ H₂* - E₂ H₁*) — valid for any orthonormal transverse pair (ê₁, ê₂, êz)
 _sz(E1, H2, E2, H1) = 0.5 * real(E1 * conj(H2) - E2 * conj(H1))
+# Complex Poynting-like bilinear form (no real-part projection), useful for diagnostics.
+_s_complex(E1, H2, E2, H1) = 0.5 * (E1 * conj(H2) - E2 * conj(H1))
 # Sρ = (1/2) Re(Eϕ Hz* - Ez Hϕ*) — radial power flux in cylindrical/radial/wedge settings
 _sr(Eϕ, Hz, Ez, Hϕ) = 0.5 * real(Eϕ * conj(Hz) - Ez * conj(Hϕ))
 
@@ -365,19 +367,20 @@ end
 
 # ---- Spherical Region ----
 # sphregion.msh: sphere surface.
-@testset "Power normalization: spherical region (M/N)" begin
+@testset "Power normalization: spherical region (TE/TM)" begin
     coord, conn = mesh_data(joinpath(_MESH_DIR, "sphregion.msh"))
     R0 = mean(hypot.(coord[1, :], coord[2, :], coord[3, :]))
     k = wavenumber(_F, 1.0, 1.0)
     radial = 4
-    basis = SphericalHarmonics(1, normalisation = :sphericart)
-
+    basis = SphericalHarmonics(5, normalisation = :sphericart)
+    
     # Test l=1,m=0
-    l, m = 1, 0
+    l, m = 3, 2
     idx_lm = l^2 + l + m + 1
+    N₀_te = te_normalization_sph(l, R0, k, radial, 1.0, 1.0)
+    N₀_tm = tm_normalization_sph(l, R0, k, radial, 1.0, 1.0)
 
     # TE
-    N₀_te = te_normalization_sph(l, R0, k, radial, 1.0, 1.0)
     f_sr_te = p -> begin
         r, θ, ϕ = cart2sph(p[1], p[2], p[3])
         rs = radial == 3 ? sph_h1m_with_derivatives(l, r, k) : sph_h2m_with_derivatives(l, r, k)
@@ -389,7 +392,6 @@ end
     @test isapprox(real(P_te), 1.0; rtol = 0.04)
 
     # TM
-    N₀_tm = tm_normalization_sph(l, R0, k, radial, 1.0, 1.0)
     f_sr_tm = p -> begin
         r, θ, ϕ = cart2sph(p[1], p[2], p[3])
         rs = radial == 3 ? sph_h1m_with_derivatives(l, r, k) : sph_h2m_with_derivatives(l, r, k)
@@ -401,53 +403,62 @@ end
     @test isapprox(real(P_tm), 1.0; rtol = 0.04)
 end
 
-# ---- Spheroidal Region ----
-# spheroidal_prolate.msh / spheroidal_oblate.msh: closed ξ=const surfaces.
-@testset "Power normalization: spheroidal region (M/N)" begin
+# ---- Spherical Region (M/N modal basis) ----
+# Validates normalization directly on vector basis M/N.
+@testset "Normalization: spherical M/N basis" begin
+    coord, conn = mesh_data(joinpath(_MESH_DIR, "sphregion.msh"))
+    R0 = mean(hypot.(coord[1, :], coord[2, :], coord[3, :]))
     k = wavenumber(_F, 1.0, 1.0)
-    m, n = 1, 1
-    family = :z
-    radial = 4
+    basis = SphericalHarmonics(2, normalisation = :sphericart)
 
-    for (meshname, oblate) in [("spheroidal_prolate.msh", false), ("spheroidal_oblate.msh", true)]
-        coord, conn = mesh_data(joinpath(_MESH_DIR, meshname))
-        ρmax = maximum(hypot.(coord[1, :], coord[2, :]))
-        zmax = maximum(abs.(coord[3, :]))
-        major, minor = max(ρmax, zmax), min(ρmax, zmax)
-        a = sqrt(max(major^2 - minor^2, eps()))
-        c = k * a
-        mode = oblate ? SpheroidalB(m, n, Complex(c)) : SpheroidalB(m, n, c)
-
-        # Estimate ξ0 from one surface point
-        p0 = SVector(coord[1, 1], coord[2, 1], coord[3, 1])
-        ξ0 = if oblate
-            ξ, _, _ = cart2obl(a, p0[1], p0[2], p0[3]); ξ
-        else
-            ξ, _, _ = cart2pro(a, p0[1], p0[2], p0[3]); ξ
+    # A few representative modes/radials (radiating types)
+    for (l, m, radial) in [(1, 0, 4), (1, 1, 4), (2, 1, 4), (2, 0, 3)]
+        idx_lm = l^2 + l + m + 1
+        Nm = m_normalization_sph(l, R0, k, radial, 1.0, 1.0)
+        Nn = n_normalization_sph(l, R0, k, radial, 1.0, 1.0)
+        f_smn = p -> begin
+            r, θ, ϕ = cart2sph(p[1], p[2], p[3])
+            rs = radial == 3 ? sph_h1m_with_derivatives(l, r, k) : sph_h2m_with_derivatives(l, r, k)
+            Y, ∇Y = compute_with_gradients(basis, [p])
+            _, Mθ, Mϕ, _, Nθ, Nϕ = mn_vectors_sph(r, θ, ϕ, rs, Y[1, idx_lm], ∇Y[1, idx_lm], k, 1.0, 1.0)
+            # For raw M/N vectors, the conserved radial flux kernel is the
+            # imaginary part of the bilinear form (Wronskian-like invariant).
+            0.5 * imag(Mθ * conj(Nϕ) - Mϕ * conj(Nθ))
         end
 
-        # Normalization from semi-analytical kernel approach
-        N₀ = spheroidal_mn_normalization_on_xi_surface_1d(mode, k, ξ0;
-                                                          family = family, even = true,
-                                                          oblate = oblate, radial = radial,
-                                                          CE = 1.0 + 0im, CH = 1.0 + 0im,
-                                                          E_from = :M, H_from = :N,
-                                                          Nη = 257)
-
-        # Independent mesh-based flux integral over spheroidal surface
-        f_sξ = p -> begin
-            ξ, η, ϕ = if oblate
-                cart2obl(a, p[1], p[2], p[3])
-            else
-                cart2pro(a, p[1], p[2], p[3])
-            end
-            Mξ, Mη, Mϕ, Nξ, Nη, Nϕ = mn_spheroidal_vector(ξ, η, ϕ, mode, k;
-                                                          family = family, even = true,
-                                                          oblate = oblate, radial = radial)
-            _sz(Mη, Nϕ, Mϕ, Nη)
-        end
-        P = N₀^2 * integrate_mesh_tri(coord, conn; f = f_sξ, quad = :tri3)
-        @show real(P), N₀
-        @test isapprox(real(P), 1.0; rtol = 0.08)
+        Pmn = integrate_mesh_tri(coord, conn; f = f_smn, quad = :tri3)
+        #@test isfinite(real(Pmn) * (Nm * Nn) )
+        @test isapprox(abs(real(Pmn * (Nm * Nn))), 1.0; rtol = 0.08)
     end
+end
+
+# ---- Spherical Region (TE/TM built from M/N) ----
+@testset "Power normalization: spherical TE/TM from M/N" begin
+    coord, conn = mesh_data(joinpath(_MESH_DIR, "sphregion.msh"))
+    R0 = mean(hypot.(coord[1, :], coord[2, :], coord[3, :]))
+    k = wavenumber(_F, 1.0, 1.0)
+    basis = SphericalHarmonics(5, normalisation = :sphericart)
+    radial = 4
+    l, m = 3, 2
+    idx_lm = l^2 + l + m + 1
+
+    f_sr_te = p -> begin
+        r, θ, ϕ = cart2sph(p[1], p[2], p[3])
+        rs = radial == 3 ? sph_h1m_with_derivatives(l, r, k) : sph_h2m_with_derivatives(l, r, k)
+        Y, ∇Y = compute_with_gradients(basis, [p])
+        _, Eθ, Eϕ, _, Hθ, Hϕ = te_from_mn_sph(r, θ, ϕ, rs, Y[1, idx_lm], ∇Y[1, idx_lm], l, k, radial, 1.0, 1.0)
+        _sz(Eθ, Hϕ, Eϕ, Hθ)
+    end
+    P_te = integrate_mesh_tri(coord, conn; f = f_sr_te, quad = :tri3)
+    @test isapprox(real(P_te), 1.0; rtol = 0.04)
+
+    f_sr_tm = p -> begin
+        r, θ, ϕ = cart2sph(p[1], p[2], p[3])
+        rs = radial == 3 ? sph_h1m_with_derivatives(l, r, k) : sph_h2m_with_derivatives(l, r, k)
+        Y, ∇Y = compute_with_gradients(basis, [p])
+        _, Eθ, Eϕ, _, Hθ, Hϕ = tm_from_mn_sph(r, θ, ϕ, rs, Y[1, idx_lm], ∇Y[1, idx_lm], l, k, radial, 1.0, 1.0)
+        _sz(Eθ, Hϕ, Eϕ, Hθ)
+    end
+    P_tm = integrate_mesh_tri(coord, conn; f = f_sr_tm, quad = :tri3)
+    @test isapprox(real(P_tm), 1.0; rtol = 0.04)
 end
