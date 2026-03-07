@@ -1,5 +1,11 @@
-## Spheroidal coordinates functions 
+## Spheroidal coordinates functions
 
+"""
+    obl2cart(a, ξ, η, ϕ)
+
+Convert oblate spheroidal coordinates `(ξ, η, ϕ)` to Cartesian `(x, y, z)`.
+`a` is the focal distance. Ranges: `ξ ≥ 0`, `η ∈ [-1, 1]`, `ϕ ∈ [0, 2π)`.
+"""
 function obl2cart(a, ξ, η, ϕ)
     ρ = a*sqrt(ξ^2 + 1)*sqrt(1 - η^2)
     x = ρ * cos(ϕ)
@@ -8,6 +14,12 @@ function obl2cart(a, ξ, η, ϕ)
     return x,y,z
 end
 
+"""
+    pro2cart(a, ξ, η, ϕ)
+
+Convert prolate spheroidal coordinates `(ξ, η, ϕ)` to Cartesian `(x, y, z)`.
+`a` is the focal distance. Ranges: `ξ ≥ 1`, `η ∈ [-1, 1]`, `ϕ ∈ [0, 2π)`.
+"""
 function pro2cart(a, ξ, η, ϕ)
     ρ = a * sqrt(ξ^2 - 1) * sqrt(1 - η^2)
     x = ρ * cos(ϕ)
@@ -16,6 +28,12 @@ function pro2cart(a, ξ, η, ϕ)
     return x, y, z
 end
 
+"""
+    cart2pro(a, x, y, z)
+
+Convert Cartesian coordinates `(x, y, z)` to prolate spheroidal `(ξ, η, ϕ)`.
+`a` is the focal distance.
+"""
 function cart2pro(a, x, y, z)
     ρ = sqrt(x^2 + y^2)
     ϕ = atan(y, x)
@@ -28,6 +46,12 @@ function cart2pro(a, x, y, z)
     return ξ, η, ϕ
 end
 
+"""
+    cart2obl(a, x, y, z)
+
+Convert Cartesian coordinates `(x, y, z)` to oblate spheroidal `(ξ, η, ϕ)`.
+`a` is the focal distance.
+"""
 function cart2obl(a, x, y, z)
     ρ = sqrt(x^2 + y^2)
     ϕ = atan(y, x)
@@ -42,6 +66,11 @@ function cart2obl(a, x, y, z)
     return ξ, η, ϕ
 end
 
+"""
+    spheroidal_parameter(major_axis, minor_axis)
+
+Compute the focal distance `a` of a spheroid from its full major and minor axes lengths.
+"""
 function spheroidal_parameter(major_axis, minor_axis)
     a = major_axis / 2
     b = minor_axis / 2
@@ -49,6 +78,11 @@ function spheroidal_parameter(major_axis, minor_axis)
     return focal_distance / 2  
 end
 
+"""
+    scale_factors_prolate(a, ξ, η)
+
+Return the metric scale factors `(hξ, hη, hϕ)` for prolate spheroidal coordinates at `(ξ, η)`.
+"""
 function scale_factors_prolate(a, ξ, η)
     hξ = a * sqrt((ξ^2 - η^2) / (ξ^2 - 1))
     hη = a * sqrt((ξ^2 - η^2) / (1 - η^2))
@@ -56,6 +90,11 @@ function scale_factors_prolate(a, ξ, η)
     return hξ, hη, hϕ
 end
 
+"""
+    scale_factors_oblate(a, ξ, η)
+
+Return the metric scale factors `(hξ, hη, hϕ)` for oblate spheroidal coordinates at `(ξ, η)`.
+"""
 function scale_factors_oblate(a, ξ, η)
     hξ = a * sqrt((ξ^2 + η^2) / (ξ^2 + 1))
     hη = a * sqrt((ξ^2 + η^2) / (1 - η^2))
@@ -105,6 +144,11 @@ function oblate_partials(a, ξ, η, ϕ)
            eϕ_x, eϕ_y, eϕ_z
 end
 
+"""
+    prolate_vector_to_cartesian(a, ξ, η, ϕ, Vξ, Vη, Vϕ)
+
+Convert a vector `(Vξ, Vη, Vϕ)` in prolate spheroidal components to Cartesian `(Vx, Vy, Vz)`.
+"""
 function prolate_vector_to_cartesian(a, ξ, η, ϕ, Vξ, Vη, Vϕ)
     hξ, hη, hϕ = scale_factors_prolate(a, ξ, η)
     ex_x, ex_y, ex_z,
@@ -118,6 +162,11 @@ function prolate_vector_to_cartesian(a, ξ, η, ϕ, Vξ, Vη, Vϕ)
     return Vx, Vy, Vz
 end
 
+"""
+    oblate_vector_to_cartesian(a, ξ, η, ϕ, Vξ, Vη, Vϕ)
+
+Convert a vector `(Vξ, Vη, Vϕ)` in oblate spheroidal components to Cartesian `(Vx, Vy, Vz)`.
+"""
 function oblate_vector_to_cartesian(a, ξ, η, ϕ, Vξ, Vη, Vϕ)
     hξ, hη, hϕ = scale_factors_oblate(a, ξ, η)
 
@@ -133,6 +182,15 @@ function oblate_vector_to_cartesian(a, ξ, η, ϕ, Vξ, Vη, Vϕ)
 end
 
 
+"""
+    SpheroidalB{I, T, T2}
+
+Pre-computed data for a single spheroidal wave function with indices `(m, n)` and
+parameter `c`. `T2 <: Real` for prolate, `T2 <: Complex` for oblate.
+
+Fields: `m`, `n`, `c`, eigenvalue `λ`, expansion coefficients `dr` and `c2k`.
+Constructed via `SpheroidalB(m, n, c)`.
+"""
 struct SpheroidalB{I, T, T2}
     m::I
     n::I
@@ -239,6 +297,12 @@ end
 
 abstract type SpheroidalBasis{I, T} end
 
+"""
+    ProlateSpheroidalBasis(m_max, n_max, c)
+
+Collection of prolate spheroidal wave functions for all `(m, n)` with
+`0 ≤ m ≤ m_max` and `m ≤ n ≤ n_max`. `c` must be real.
+"""
 struct ProlateSpheroidalBasis{I, T} <: SpheroidalBasis{I, T}
     m_max::I
     n_max::I
@@ -250,6 +314,12 @@ struct ProlateSpheroidalBasis{I, T} <: SpheroidalBasis{I, T}
     end
 end
 
+"""
+    OblateSpheroidalBasis(m_max, n_max, c)
+
+Collection of oblate spheroidal wave functions for all `(m, n)` with
+`0 ≤ m ≤ m_max` and `m ≤ n ≤ n_max`. `c` must be complex (pass `Complex(c)` for real values).
+"""
 struct OblateSpheroidalBasis{I, T} <: SpheroidalBasis{I, T}
     m_max::I
     n_max::I

@@ -99,15 +99,11 @@ function Mʳ(xi, eta, phi, S, dS, R, dR, m, d, even, type)
 end
 
 
-function Nᶻ(m, c, ξ, η, ϕ, k, basis, even, oblate)
+function Nᶻ(ξ, η, ϕ, S, ∂S, ∂²S, R, ∂R, ∂²R, m, d, k, even, oblate)
 
-    d = c / k
     factor1 = oblate ? abs(ξ)^2 + 1   : abs(ξ)^2 - 1
     factor2 = oblate ? abs(ξ)^2 + η^2 : abs(ξ)^2 - η^2
     factor3 = 1 - η^2
-
-    R, ∂R, ∂²R = evaluate_radial4(basis, ξ)
-    S, ∂S, ∂²S = evaluate_angular(basis, η)
     smϕ, cmϕ = sincos(m * ϕ)
 
     v1 = factor1 / factor2
@@ -161,12 +157,7 @@ function Nᶻ(m, c, ξ, η, ϕ, k, basis, even, oblate)
 end
 
 
-function Nˣ(m, c, ξ, η, ϕ, k, basis, even, oblate)
-
-    d = c / k
-
-    R, ∂R, ∂²R = evaluate_radial4(basis, ξ)
-    S, ∂S, ∂²S = evaluate_angular(basis, η)
+function Nˣ(ξ, η, ϕ, S, ∂S, ∂²S, R, ∂R, ∂²R, m, d, k, even, oblate)
     smϕ, cmϕ = sincos(m * ϕ)
     sm2ϕ = sin(m*ϕ)
     if !even
@@ -222,13 +213,7 @@ function Nˣ(m, c, ξ, η, ϕ, k, basis, even, oblate)
     return (Nˣξ, Nˣη, Nˣϕ)
 end
 
-
-function Nʸ(m, c, ξ, η, ϕ, k, basis, even, oblate)
-
-    d = c / k
-
-    R, ∂R, ∂²R = evaluate_radial4(basis, ξ)
-    S, ∂S, ∂²S = evaluate_angular(basis, η)
+function Nʸ(ξ, η, ϕ, S, ∂S, ∂²S, R, ∂R, ∂²R, m, d, k, even, oblate)
     smϕ, cmϕ = sincos(m * ϕ)
     sm2ϕ = sin(m*ϕ)
     if !even
@@ -284,11 +269,7 @@ function Nʸ(m, c, ξ, η, ϕ, k, basis, even, oblate)
     return (Nʸξ, Nʸη, Nʸϕ)
 end
 
-function Nʳ(m, c, ξ, η, ϕ, k, basis, even, oblate)
-    d = c / k
-
-    R, ∂R, ∂²R = evaluate_radial4(basis, ξ)
-    S, ∂S, ∂²S = evaluate_angular(basis, η)
+function Nʳ(ξ, η, ϕ, S, ∂S, ∂²S, R, ∂R, ∂²R, m, d, k, even, oblate)
     smϕ, cmϕ = sincos(m * ϕ)
     sm2ϕ = sin(m * ϕ)
     if !even

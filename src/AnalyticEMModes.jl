@@ -24,6 +24,7 @@ module AnalyticEMModes
     include("./spherical.jl")
 
     # Spheroidal Coordinated
+    include("./spheroidal.jl")
     # Sort modes
     include("./sortmodes.jl")
     
@@ -51,6 +52,16 @@ module AnalyticEMModes
     export first_n_modes_rwg, first_n_modes_cwg, first_n_modes_coax, first_n_modes_radial, first_n_modes_ewg
 
     export kc_sph, te_sph_fields_lmax, tm_sph_fields_lmax, tm_sph_fields, te_sph_fields, te_normalization_sph, tm_normalization_sph
-    export first_n_modes_sph, spherical_to_cartesian_fields, to_svector, mn_vectors_sph, mn_sph_vectors_lmax
+    export first_n_modes_sph, spherical_to_cartesian_fields, to_svector
+    export mn_vectors_sph, mn_sph_vectors_lmax, m_sph_vectors_lmax, n_sph_vectors_lmax
+    export m_normalization_sph, n_normalization_sph
+
+    export mn_spheroidal_vector, m_spheroidal_vector, n_spheroidal_vector
+    export mn_spheroidal_vectors, m_spheroidal_vectors, n_spheroidal_vectors
+    export mn_spheroidal_vectors_mnmax
+    export ProlateSpheroidalBasis, OblateSpheroidalBasis, SpheroidalB
+    export obl2cart, pro2cart, cart2pro, cart2obl, spheroidal_parameter
+    export scale_factors_prolate, scale_factors_oblate
+    export prolate_vector_to_cartesian, oblate_vector_to_cartesian
     
 end

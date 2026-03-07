@@ -152,38 +152,46 @@ end
 
 
 """
-    te_sph_fields_lmax(r_vec, lmax, f, μᵣ, εᵣ, incident)
+    te_sph_fields_lmax(r_vec, lmax, f, μᵣ, εᵣ, radial=4)
+
+Compute TE spherical mode fields for all `(l, m)` up to `lmax`.
+
+Returns a matrix `A[p, i]` of `NTuple{6, ComplexF64}` with `(Eᵣ, Eθ, Eϕ, Hᵣ, Hθ, Hϕ)` in
+spherical components. The mode index follows `i = l² + l + m + 1`.
 
 # Arguments
-- `r_vec`: vector of `SVector{3, T}` with the position of each point in cartesian coordinates.
-- `lmax`: max value of L of the modes TE_{lm}. The total number of modes is (lmax+1)^2.
-- `f`: Frequency in Hz
-- `μᵣ`: Relative permeability
-- `εᵣ`: Relative permittivity
-- `incident`: ongoing or outgoing wave (`true` or `false`)
-
+- `r_vec`: vector of `SVector{3, T}` with point coordinates in Cartesian form.
+- `lmax`: maximum degree `l`. Total number of modes is `(lmax+1)²`.
+- `f`: frequency in Hz.
+- `μᵣ`: relative permeability.
+- `εᵣ`: relative permittivity.
+- `radial`: radial function type (1=j, 2=y, 3=h₁ incoming, 4=h₂ outgoing). Default: `4`.
 """
-function te_sph_fields_lmax(r_vec, lmax::Int, f, μᵣ, εᵣ, incident)
+function te_sph_fields_lmax(r_vec, lmax::Int, f, μᵣ, εᵣ, radial::Int = 4)
 
     basis = SphericalHarmonics(lmax, normalisation = :sphericart)
     A = Array{NTuple{6, ComplexF64}, 2}(undef, length(r_vec), (lmax+1)^2)
     Rs = Matrix{NTuple{3, ComplexF64}}(undef, length(r_vec), lmax+1)
-    _te_sph_fields_lmax!(A, Rs, r_vec, basis, lmax, f, μᵣ, εᵣ, incident)
-    
+    _te_sph_fields_lmax!(A, Rs, r_vec, basis, lmax, f, μᵣ, εᵣ, radial)
+
     return A
 end
 
 
-function _te_sph_fields_lmax!(A, Rs, r_vec, basis, lmax::Int, f, μᵣ, εᵣ, incident)
+function _te_sph_fields_lmax!(A, Rs, r_vec, basis, lmax::Int, f, μᵣ, εᵣ, radial::Int)
 
     sph_coords = map(x->cart2sph(x[1], x[2], x[3]),r_vec)
 
     k = wavenumber(f, μᵣ, εᵣ)
     for l in 0:lmax
-        for i in eachindex(r_vec) 
+        for i in eachindex(r_vec)
             x, y, z = r_vec[i]
             r = hypot(x, y, z)
-            R, R´, R´´ =  incident == true ? sph_h1m_with_derivatives(l, r, k) : sph_h2m_with_derivatives(l, r, k)
+            if radial == 3
+                R, R´, R´´ = sph_h1m_with_derivatives(l, r, k)
+            else
+                R, R´, R´´ = sph_h2m_with_derivatives(l, r, k)
+            end
             Rs[i, l+1] = (R, R´, R´´)
         end
     end
@@ -205,7 +213,20 @@ end
 
 
 """
+    te_sph_fields(r, θ, ϕ, rs, ylm, ylm_p, k, μᵣ, εᵣ)
 
+Compute TE spherical mode fields at a single point `(r, θ, ϕ)` given pre-computed radial
+data `rs = (R, R′, R″_k)`, spherical harmonic value `ylm`, its gradient `ylm_p`, and
+medium parameters. Returns `(Eᵣ, Eθ, Eϕ, Hᵣ, Hθ, Hϕ)`.
+"""
+function te_sph_fields end
+
+"""
+    tm_sph_fields(r, θ, ϕ, rs, ylm, ylm_p, k, μᵣ, εᵣ)
+
+Compute TM spherical mode fields at a single point `(r, θ, ϕ)` given pre-computed radial
+data `rs = (R, R′, R″_k)`, spherical harmonic value `ylm`, its gradient `ylm_p`, and
+medium parameters. Returns `(Eᵣ, Eθ, Eϕ, Hᵣ, Hθ, Hϕ)`.
 """
 function tm_sph_fields(r, θ, ϕ, rs, ylm, ylm_p, k, μᵣ, εᵣ)
     μ = μᵣ * _μₒ
@@ -226,39 +247,46 @@ end
 
 
 """
-    tm_sph_fields_lmax(r_vec, lmax, f, μᵣ, εᵣ, incident)
+    tm_sph_fields_lmax(r_vec, lmax, f, μᵣ, εᵣ, radial=4)
+
+Compute TM spherical mode fields for all `(l, m)` up to `lmax`.
+
+Returns a matrix `A[p, i]` of `NTuple{6, ComplexF64}` with `(Eᵣ, Eθ, Eϕ, Hᵣ, Hθ, Hϕ)` in
+spherical components. The mode index follows `i = l² + l + m + 1`.
 
 # Arguments
-- `r_vec`: vector of `SVector{3, T}` with the position of each point in cartesian coordinates.
-- `lmax`: max value of L of the modes TM_{lm}. The total number of modes is (lmax+1)^2.
-- `f`: Frequency in Hz
-- `μᵣ`: Relative permeability
-- `εᵣ`: Relative permittivity
-- `incident::Bool`: ongoing or outgoing wave.
-
+- `r_vec`: vector of `SVector{3, T}` with point coordinates in Cartesian form.
+- `lmax`: maximum degree `l`. Total number of modes is `(lmax+1)²`.
+- `f`: frequency in Hz.
+- `μᵣ`: relative permeability.
+- `εᵣ`: relative permittivity.
+- `radial`: radial function type (1=j, 2=y, 3=h₁ incoming, 4=h₂ outgoing). Default: `4`.
 """
-function tm_sph_fields_lmax(r_vec, lmax::Int, f, μᵣ, εᵣ, incident)
+function tm_sph_fields_lmax(r_vec, lmax::Int, f, μᵣ, εᵣ, radial::Int = 4)
 
     basis = SphericalHarmonics(lmax, normalisation = :sphericart)
     A = Array{NTuple{6, ComplexF64}, 2}(undef, length(r_vec), (lmax+1)^2)
     Rs = Matrix{NTuple{3, ComplexF64}}(undef, length(r_vec), lmax+1)
-    _tm_sph_fields_lmax!(A, Rs, r_vec, basis, lmax, f, μᵣ, εᵣ, incident)
-    
+    _tm_sph_fields_lmax!(A, Rs, r_vec, basis, lmax, f, μᵣ, εᵣ, radial)
+
     return A
 end
 
 
-function _tm_sph_fields_lmax!(A, Rs, r_vec, basis, lmax::Int, f, μᵣ, εᵣ, incident)
-
+function _tm_sph_fields_lmax!(A, Rs, r_vec, basis, lmax::Int, f, μᵣ, εᵣ, radial::Int)
 
     sph_coords = map(x->cart2sph(x[1], x[2], x[3]),r_vec)
 
     k = wavenumber(f, μᵣ, εᵣ)
     for l in 0:lmax
-        for i in eachindex(r_vec) 
+        for i in eachindex(r_vec)
             x, y, z = r_vec[i]
             r = hypot(x, y, z)
-            R, R´, R´´ =  incident == true ? sph_h1m_with_derivatives(l, r, k) : sph_h2m_with_derivatives(l, r, k)
+            if radial == 3
+                R, R´, R´´ = sph_h1m_with_derivatives(l, r, k)
+            else
+                R, R´, R´´ = sph_h2m_with_derivatives(l, r, k)
+            end
             Rs[i, l+1] = (R, R´, R´´)
         end
     end
@@ -350,6 +378,12 @@ function metric_and_unit_spherical(r, θ, ϕ)
 end
 
 
+"""
+    spherical_to_cartesian_fields(E_r, E_θ, E_ϕ, H_r, H_θ, H_ϕ, θ, ϕ)
+
+Convert electromagnetic field components from spherical `(r, θ, ϕ)` to Cartesian `(x, y, z)`.
+Returns `(Eₓ, Eᵧ, E_z, Hₓ, Hᵧ, H_z)`.
+"""
 function spherical_to_cartesian_fields(E_r, E_θ, E_ϕ, H_r, H_θ, H_ϕ, θ, ϕ)
 
     st, ct = sincos(θ)
@@ -369,26 +403,26 @@ end
 
 
 """
-    tm_normalization_sph(r, k, incident, μᵣ, εᵣ)
+    tm_normalization_sph(l, r, k, radial, μᵣ, εᵣ)
 
-Normalization factor for TM modes to achieve unit power.
+Normalization factor for TM spherical modes to achieve unit power.
 
-The expression can be derived by integrating the Poynting vector over the cross-section of the guide.
+Derived by integrating the Poynting vector over a sphere of radius `r`.
 
 # Arguments
-- `l`: mode index
-- `r`: Radial coordinate
-- `k`: propagation constant
-- `incident::Bool`: ongoing or outgoing wave 
-- `μᵣ`: Relative permeability
-- `εᵣ`: Relative permittivity
+- `l`: degree of the mode.
+- `r`: evaluation radius.
+- `k`: wavenumber.
+- `radial`: radial function type (3=h₁, 4=h₂).
+- `μᵣ`: relative permeability.
+- `εᵣ`: relative permittivity.
 """
-function tm_normalization_sph(l, r, k, incident, μᵣ, εᵣ)
+function tm_normalization_sph(l, r, k, radial::Int, μᵣ, εᵣ)
     ε = εᵣ * _εₒ
     μ = μᵣ * _μₒ
     c = 1 / sqrt(μ * ε)
     ω = k * c
-    R, Rp, _ = incident == true ? sph_h1m_with_derivatives(l, r, k) : sph_h2m_with_derivatives(l, r, k)
+    R, Rp, _ = radial == 3 ? sph_h1m_with_derivatives(l, r, k) : sph_h2m_with_derivatives(l, r, k)
     P_unnormalized = abs( (k * r^2)/(2 * ω * μ^2 * ε) * real(im * R * Rp) * l * (l+1))
     norm_factor = sqrt(1 / P_unnormalized)
     return norm_factor
@@ -396,41 +430,67 @@ end
 
     
 """
-    te_normalization_sph(l, r, k, incident, μᵣ, εᵣ)
+    te_normalization_sph(l, r, k, radial, μᵣ, εᵣ)
 
-Normalization factor for TE modes to achieve unit power.
+Normalization factor for TE spherical modes to achieve unit power.
 
-The expression can be derived by integrating the Poynting vector over the cross-section of the guide.
+Derived by integrating the Poynting vector over a sphere of radius `r`.
 
 # Arguments
-- `l`: mode index
-- `r`: Radial coordinate
-- `k`: propagation constant
-- `incident::Bool`: ongoing or outgoing wave 
-- `μᵣ`: Relative permeability
-- `εᵣ`: Relative permittivity
+- `l`: degree of the mode.
+- `r`: evaluation radius.
+- `k`: wavenumber.
+- `radial`: radial function type (3=h₁, 4=h₂).
+- `μᵣ`: relative permeability.
+- `εᵣ`: relative permittivity.
 """
-function te_normalization_sph(l, r, k, incident, μᵣ, εᵣ)
+function te_normalization_sph(l, r, k, radial::Int, μᵣ, εᵣ)
     ε = εᵣ * _εₒ
     μ = μᵣ * _μₒ
     c = 1 / sqrt(μ * ε)
     ω = k * c
-    R, Rp, _ = incident == true ? sph_h1m_with_derivatives(l, r, k) : sph_h2m_with_derivatives(l, r, k)
+    R, Rp, _ = radial == 3 ? sph_h1m_with_derivatives(l, r, k) : sph_h2m_with_derivatives(l, r, k)
     P_unnormalized = abs( (k * r^2)/(2 * ω * μ * ε^2) * real(im * R * Rp) * l * (l+1))
     norm_factor = sqrt(1 / P_unnormalized)
     return norm_factor
 end
 
 
-# Just for testing
-function m_normalization_sph(l, r, k, incident, μᵣ, εᵣ)
-    ε = εᵣ * _εₒ
-    μ = μᵣ * _μₒ
-    c = 1 / sqrt(μ * ε)
-    ω = k * c
-    R, Rp, _ = incident == true ? sph_h1m_with_derivatives(l, r, k) : sph_h2m_with_derivatives(l, r, k)
-    norm_factor =  sqrt(1 / ((l*(l+1)) * 1/r^2 * abs2(R)))
+"""
+    m_normalization_sph(l, r, k, radial, μᵣ, εᵣ)
+
+Normalization factor for **M** spherical wave vectors to achieve unit power.
+
+# Arguments
+- `l`: degree of the mode.
+- `r`: evaluation radius.
+- `k`: wavenumber.
+- `radial`: radial function type (3=h₁, 4=h₂).
+- `μᵣ`: relative permeability.
+- `εᵣ`: relative permittivity.
+"""
+function m_normalization_sph(l, r, k, radial::Int, μᵣ, εᵣ)
+    R, _, _ = radial == 3 ? sph_h1m_with_derivatives(l, r, k) : sph_h2m_with_derivatives(l, r, k)
+    norm_factor = sqrt(1 / ((l*(l+1)) * 1/r^2 * abs2(R)))
     return norm_factor
+end
+
+"""
+    n_normalization_sph(l, r, k, radial, μᵣ, εᵣ)
+
+Normalization factor for **N** spherical wave vectors to achieve unit power.
+Equivalent to `tm_normalization_sph`.
+
+# Arguments
+- `l`: degree of the mode.
+- `r`: evaluation radius.
+- `k`: wavenumber.
+- `radial`: radial function type (3=h₁, 4=h₂).
+- `μᵣ`: relative permeability.
+- `εᵣ`: relative permittivity.
+"""
+function n_normalization_sph(l, r, k, radial::Int, μᵣ, εᵣ)
+    return tm_normalization_sph(l, r, k, radial, μᵣ, εᵣ)
 end
 
 """
@@ -453,27 +513,69 @@ function mn_vectors_sph(r, θ, ϕ, rs, ylm, ylm_p, k, μᵣ, εᵣ)
 end
 
 
-function mn_sph_vectors_lmax(r_vec, lmax::Int, f, μᵣ, εᵣ, incident)
+"""
+    mn_sph_vectors_lmax(r_vec, lmax, f, μᵣ, εᵣ, radial=4)
+
+Compute normalized **M** and **N** spherical wave vectors for all `(l, m)` up to `lmax`.
+
+Returns a matrix `A[p, i]` of `NTuple{6, ComplexF64}` with `(Mᵣ, Mθ, Mϕ, Nᵣ, Nθ, Nϕ)` in
+spherical components. Modes are indexed by `i = l² + l + m + 1`.
+
+# Arguments
+- `r_vec`: vector of `SVector{3, T}` with point coordinates in Cartesian form.
+- `lmax`: maximum degree `l`. Total number of modes is `(lmax+1)²`.
+- `f`: frequency in Hz.
+- `μᵣ`: relative permeability.
+- `εᵣ`: relative permittivity.
+- `radial`: radial function type (1=j, 2=y, 3=h₁ incoming, 4=h₂ outgoing). Default: `4`.
+"""
+function mn_sph_vectors_lmax(r_vec, lmax::Int, f, μᵣ, εᵣ, radial::Int = 4)
 
     basis = SphericalHarmonics(lmax, normalisation = :sphericart)
     A = Array{NTuple{6, ComplexF64}, 2}(undef, length(r_vec), (lmax+1)^2)
     Rs = Matrix{NTuple{3, ComplexF64}}(undef, length(r_vec), lmax+1)
-    _mn_sph_vectors_lmax!(A, Rs, r_vec, basis, lmax, f, μᵣ, εᵣ, incident)
-    
+    _mn_sph_vectors_lmax!(A, Rs, r_vec, basis, lmax, f, μᵣ, εᵣ, radial)
+
     return A
 end
 
-function _mn_sph_vectors_lmax!(A, Rs, r_vec, basis, lmax::Int, f, μᵣ, εᵣ, incident)
+"""
+    m_sph_vectors_lmax(r_vec, lmax, f, μᵣ, εᵣ, radial=4)
+
+Compute normalized **M** spherical wave vectors for all `(l, m)` up to `lmax`.
+Returns a matrix of `NTuple{3, ComplexF64}` with `(Mᵣ, Mθ, Mϕ)`. See [`mn_sph_vectors_lmax`](@ref).
+"""
+function m_sph_vectors_lmax(r_vec, lmax::Int, f, μᵣ, εᵣ, radial::Int = 4)
+    B = mn_sph_vectors_lmax(r_vec, lmax, f, μᵣ, εᵣ, radial)
+    return [(b[1], b[2], b[3]) for b in B]
+end
+
+"""
+    n_sph_vectors_lmax(r_vec, lmax, f, μᵣ, εᵣ, radial=4)
+
+Compute normalized **N** spherical wave vectors for all `(l, m)` up to `lmax`.
+Returns a matrix of `NTuple{3, ComplexF64}` with `(Nᵣ, Nθ, Nϕ)`. See [`mn_sph_vectors_lmax`](@ref).
+"""
+function n_sph_vectors_lmax(r_vec, lmax::Int, f, μᵣ, εᵣ, radial::Int = 4)
+    B = mn_sph_vectors_lmax(r_vec, lmax, f, μᵣ, εᵣ, radial)
+    return [(b[4], b[5], b[6]) for b in B]
+end
+
+function _mn_sph_vectors_lmax!(A, Rs, r_vec, basis, lmax::Int, f, μᵣ, εᵣ, radial::Int)
 
     sph_coords = map(x->cart2sph(x[1], x[2], x[3]),r_vec)
     xi, yi, zi = r_vec[1]
     ri = hypot(xi, yi, zi)
     k = wavenumber(f, μᵣ, εᵣ)
     for l in 0:lmax
-        for i in eachindex(r_vec) 
+        for i in eachindex(r_vec)
             x, y, z = r_vec[i]
             r = hypot(x, y, z)
-            R, R´, R´´ =  incident == true ? sph_h1m_with_derivatives(l, r, k) : sph_h2m_with_derivatives(l, r, k)
+            if radial == 3
+                R, R´, R´´ = sph_h1m_with_derivatives(l, r, k)
+            else
+                R, R´, R´´ = sph_h2m_with_derivatives(l, r, k)
+            end
             Rs[i, l+1] = (R, R´, R´´)
         end
     end
@@ -481,7 +583,7 @@ function _mn_sph_vectors_lmax!(A, Rs, r_vec, basis, lmax::Int, f, μᵣ, εᵣ, 
     Ylm, ∇Ylm = compute_with_gradients(basis, r_vec)
 
     for l in 1:lmax
-        factor = m_normalization_sph(l, ri, k, incident, μᵣ, εᵣ)
+        factor = m_normalization_sph(l, ri, k, radial, μᵣ, εᵣ)
         for m in -l:l
             #idx = SpheriCart.lm2idx(l, m) # not public
             idx = l^2 + l + m + 1
