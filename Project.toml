@@ -1,6 +1,6 @@
 name = "AnalyticEMModes"
 uuid = "4347a9b3-a74f-4459-95f9-6cf3b5a9075d"
-version = "1.0.0"
+version = "0.2.0"
 
 [deps]
 Bessels = "0e736298-9ec6-45e8-9647-e4fc86a2fe38"
