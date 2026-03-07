@@ -1,7 +1,7 @@
 
 using Gmsh
 using Gmsh: gmsh
-using GLMakie
+using CairoMakie
 using AnalyticEMModes
 
 include(joinpath(@__DIR__, "example_mesh.jl"))
