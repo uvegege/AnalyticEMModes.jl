@@ -28,8 +28,8 @@ zcoords = coords[3, :]
 #r_vec = [SVector(v...) for v in eachcol(coords)]
 r_vec = to_svector(xcoords, ycoords, zcoords)
 
-incident = false
-myfields = te_sph_fields_lmax(r_vec, lmax, 10e9, 1.0, 1.0, incident)
+
+myfields = te_sph_fields_lmax(r_vec, lmax, 10e9, 1.0, 1.0, 4)
 
 lm_pairs = [(4, 1), (6, -2)]
 
@@ -99,7 +99,7 @@ mode = mn[:, idx]
 
 Mcart = map(mode, r_vec) do mi, ri
     Mr, Mθ, Mϕ, Nr, Nθ, Nϕ = mi
-    _, θ, ϕ = cart2sph(ri...)
+    _, θ, ϕ = AnalyticEMModes.cart2sph(ri...)
     Ex, Ey, Ez, _, _, _ = spherical_to_cartesian_fields(Mr, Mθ, Mϕ, 0.0, 0.0, 0.0, θ, ϕ)
     (Ex, Ey, Ez, Nr)
 end

@@ -90,10 +90,10 @@ end
 ϕs = map(t -> t[3], ξηϕ)
 points = to_svector(ξs, ηs, ϕs)
 
-basis = ProlateSpheroidalBasis(2, 3, 2.4)
+basis = ProlateSpheroidalBasis(4, 7, 2.4)
 mn = mn_spheroidal_vectors(points, basis, k; family=:z, even=true, radial=4)
 
-mode_idx = 4
+mode_idx = 2
 Mcart = map(eachindex(points)) do i
     ξ, η, ϕ = points[i]
     Mξ, Mη, Mϕ, Nξ, Nη, Nϕ = mn[i, mode_idx]
