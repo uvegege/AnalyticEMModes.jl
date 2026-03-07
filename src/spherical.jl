@@ -474,7 +474,7 @@ with the bilinear flux pairing between **M** and **N**:
     P ∝ ∫ Im{ Mₜ × Nₜ* } · r̂ dA
 
 The complementary scaling between **M** and **N** is therefore set through
-[`n_normalization_sph`](@ref), which fixes the M–N flux normalization.
+`n_normalization_sph`, which fixes the M–N flux normalization.
 
 # Arguments
 - `l`: degree of the mode.
@@ -497,7 +497,7 @@ end
 
 Normalization factor for the spherical vector wave function **Nₗₘ**
 defined so that, together with the scaling returned by
-[`m_normalization_sph`](@ref), the bilinear M–N flux pairing on a sphere is
+`m_normalization_sph`, the bilinear M–N flux pairing on a sphere is
 unit-normalized.
 
 This function does **not** normalize **N** independently in an `L²` sense.
@@ -510,13 +510,13 @@ after applying both normalization factors.
 
 In practice:
 
-- [`m_normalization_sph`](@ref) first fixes the amplitude of **M** through a
+- `m_normalization_sph` first fixes the amplitude of **M** through a
   surface `L²` normalization (`∫ |M|² dA = 1`);
 - `n_normalization_sph` then determines the complementary scaling of **N**
   so that the bilinear M–N pairing becomes unitary.
 
 Therefore, this normalization **depends on the convention used for**
-[`m_normalization_sph`](@ref). The two functions must be used together.
+`m_normalization_sph`. The two functions must be used together.
 
 This is a **basis normalization convention** for the spherical
 vector-wave-function formalism. It is **not** equivalent to unit
@@ -568,7 +568,7 @@ Build TE spherical fields from the `M/N` vector basis and return
 `(Eᵣ, Eθ, Eϕ, Hᵣ, Hθ, Hϕ)`.
 
 When `normalize=true` (default), fields are scaled with
-[`te_normalization_sph`](@ref) to unit power.
+`te_normalization_sph` to unit power.
 """
 function te_from_mn_sph(r, θ, ϕ, rs, ylm, ylm_p, l, k, radial::Int, μᵣ, εᵣ; normalize::Bool = true)
     μ = μᵣ * _μₒ
@@ -598,7 +598,7 @@ Build TM spherical fields from the `M/N` vector basis and return
 `(Eᵣ, Eθ, Eϕ, Hᵣ, Hθ, Hϕ)`.
 
 When `normalize=true` (default), fields are scaled with
-[`tm_normalization_sph`](@ref) to unit power.
+`tm_normalization_sph` to unit power.
 """
 function tm_from_mn_sph(r, θ, ϕ, rs, ylm, ylm_p, l, k, radial::Int, μᵣ, εᵣ; normalize::Bool = true)
     μ = μᵣ * _μₒ
@@ -651,7 +651,7 @@ end
     m_sph_vectors_lmax(r_vec, lmax, f, μᵣ, εᵣ, radial=4)
 
 Compute normalized **M** spherical wave vectors for all `(l, m)` up to `lmax`.
-Returns a matrix of `NTuple{3, ComplexF64}` with `(Mᵣ, Mθ, Mϕ)`. See [`mn_sph_vectors_lmax`](@ref).
+Returns a matrix of `NTuple{3, ComplexF64}` with `(Mᵣ, Mθ, Mϕ)`. See `mn_sph_vectors_lmax`.
 """
 function m_sph_vectors_lmax(r_vec, lmax::Int, f, μᵣ, εᵣ, radial::Int = 4)
     B = mn_sph_vectors_lmax(r_vec, lmax, f, μᵣ, εᵣ, radial)
@@ -662,7 +662,7 @@ end
     n_sph_vectors_lmax(r_vec, lmax, f, μᵣ, εᵣ, radial=4)
 
 Compute normalized **N** spherical wave vectors for all `(l, m)` up to `lmax`.
-Returns a matrix of `NTuple{3, ComplexF64}` with `(Nᵣ, Nθ, Nϕ)`. See [`mn_sph_vectors_lmax`](@ref).
+Returns a matrix of `NTuple{3, ComplexF64}` with `(Nᵣ, Nθ, Nϕ)`. See `mn_sph_vectors_lmax`.
 """
 function n_sph_vectors_lmax(r_vec, lmax::Int, f, μᵣ, εᵣ, radial::Int = 4)
     B = mn_sph_vectors_lmax(r_vec, lmax, f, μᵣ, εᵣ, radial)

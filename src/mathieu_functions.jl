@@ -655,7 +655,7 @@ end
 """
     find_zero_ewg(func::F, m, T::Symbol; inc_iters = 500, max_iters = 70, tol = 1e-10)
 
-Wrapper for [`find_zero_ewg`](@ref) that automatically selects an initial guess `q`
+Wrapper for `find_zero_ewg` that automatically selects an initial guess `q`
 based on the mode type `T` (`:TE` or `:TM`) and the azimuthal index `m`.
 """
 function find_zero_ewg(func::F, m, T::Symbol; inc_iters = 500, max_iters=70, tol=1e-10) where F
@@ -673,7 +673,7 @@ end
 
 Finds the `n`-th zero of `func` for a given azimuthal index `m` and mode type `T`.
 
-Internally calls [`find_zero_ewg`](@ref) iteratively, using each previously found
+Internally calls `find_zero_ewg` iteratively, using each previously found
 zero as the starting point for the next one.
 """
 function find_n_zero_ewg(func::F, m, n, T; inc_iters = 500, max_iters=70, tol=1e-10) where F

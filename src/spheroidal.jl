@@ -217,7 +217,7 @@ end
     mn_spheroidal_vectors(xi, eta, phi, basis::SpheroidalBasis, k; kwargs...)
 
 Convenience overload accepting separate coordinate arrays `xi`, `eta`, `phi`.
-See [`mn_spheroidal_vectors`](@ref) for keyword arguments.
+See `mn_spheroidal_vectors` for keyword arguments.
 """
 function mn_spheroidal_vectors(xi::AbstractArray, eta::AbstractArray, phi::AbstractArray,
                                basis::SpheroidalBasis, k; kwargs...)
@@ -232,7 +232,7 @@ end
 Build a spheroidal basis with all `(m, n)` for `0 ≤ m ≤ m_max`, `m ≤ n ≤ n_max` and
 evaluate all M/N vectors in one call. `c` is the spheroidal parameter.
 
-See [`mn_spheroidal_vectors`](@ref) for keyword arguments.
+See `mn_spheroidal_vectors` for keyword arguments.
 """
 function mn_spheroidal_vectors_mnmax(points, m_max, n_max, c, k;
                                      oblate::Bool = false, family::Symbol = :z,

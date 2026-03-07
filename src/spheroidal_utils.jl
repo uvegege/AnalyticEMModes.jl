@@ -377,7 +377,7 @@ where `N = length(basis.basis)`.
 Use this when the ϕ-dependence is handled separately — in particular, to supply
 `S, ∂S, ∂²S` to the N vector functions, which require second derivatives.
 
-See also [`compute_angular_with_derivatives`](@ref) for the full complex mode function
+See also `compute_angular_with_derivatives` for the full complex mode function
 ψ = S(η)·e^{imϕ} with its (η, ϕ) gradient.
 """
 function compute_angular_derivatives(basis::SpheroidalBasis{I, T}, r) where {I, T}
@@ -410,7 +410,7 @@ gradient, for all modes in `basis` and all points in `r`.
 Use this for expansion matrices and boundary condition integrals where the full
 complex mode function is needed.
 
-See also [`compute_angular_derivatives`](@ref) for the real `S, ∂S, ∂²S` needed
+See also `compute_angular_derivatives` for the real `S, ∂S, ∂²S` needed
 by the N vector functions.
 """
 function compute_angular_with_derivatives(basis::SpheroidalBasis{I, T}, r) where {I, T}
