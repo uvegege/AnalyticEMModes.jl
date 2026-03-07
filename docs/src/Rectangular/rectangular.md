@@ -35,7 +35,7 @@ nev = 10
 λ_tm, ϕ_tm = eigs(A_tm, B_tm; nev=nev, which=:SM, maxiter=5300)
 
 
-using GLMakie
+using CairoMakie
 fig = Figure( size = (800, 400) )
 
 freq = 10.0e9

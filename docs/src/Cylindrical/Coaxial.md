@@ -20,7 +20,7 @@ To validate the analytical solutions, we compare numerical eigenmode results obt
 
 ```julia
 
-using GLMakie
+using CairoMakie
 
 name = "../Assets/mesh/coax_wg1.msh"
 
@@ -107,7 +107,7 @@ We now visualize the first 24 TE modes computed analytically using `te_coax_fiel
 
 ```@example
 
-using GLMakie
+using CairoMakie
 
 name = "../Assets/mesh/coax_wg2.msh"
 R1 = 1

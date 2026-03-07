@@ -20,7 +20,7 @@ The Hz field (longitudinal magnetic component) for the first **TE** modes comput
 
 ```julia
 
-using GLMakie
+using CairoMakie
 
 name = "../Assets/mesh/elliptic_wg1.msh"
 a = 1
@@ -103,7 +103,7 @@ The following code evaluates the analytical **TE** mode fields using `te_ewg_fie
 
 ```@example
 
-using GLMakie
+using CairoMakie
 
 name = "../Assets/mesh/elliptic_wg1.msh"
 a = 1

@@ -20,7 +20,7 @@ using Gridap.Geometry
 using Gridap.ReferenceFEs
 using Gridap.Visualization
 using Arpack
-using GLMakie
+using CairoMakie
 ```
 
 ## Helper Functions
