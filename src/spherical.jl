@@ -4,7 +4,11 @@
 
 using SpheriCart, StaticArrays
 
+"""
+    kc_sph()
 
+Returns 0.0
+"""
 kc_sph() = 0.0
 
 # spherical bessel functions

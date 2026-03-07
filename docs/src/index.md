@@ -35,8 +35,9 @@ This package provides closed-form solutions for electric and magnetic field dist
 | Coaxial        | `coax`| (r, θ)           | Yes                 |
 | Radial         | `radial`| (ρ, φ, z)      | Yes                 |
 | Wedge          | `wedge` | (ρ, φ, z)      | Yes                 |
-| Elliptical       | `ewg` | (ξ, η)           | No                  |
+| Elliptical       | `ewg` | (ξ, η)           | Yes                  |
 | Spherical      | `sph` | (r, θ, φ)        | Yes                 |
+| Spheroidal      | `spheroidal` | (ξ, η, φ)        | Yes                 |
 
 
 ## Features

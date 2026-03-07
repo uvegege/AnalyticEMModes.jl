@@ -1,9 +1,18 @@
 include("./spheroidal_utils.jl")
 include("./spheroidal_vectors.jl")
 
+"""
+    kc_spheroidal()
 
+Returns 0.0
+"""
 kc_spheroidal() = 0.0
 
+"""
+    spheroidal_families()
+
+Valid Spheroidal Mⁱ and Nⁱ: (:x, :y, :z, :r)
+"""
 spheroidal_families() = (:x, :y, :z, :r)
 
 @inline _is_oblate_basis(::SpheroidalB{I, T, T}) where {I, T} = false
