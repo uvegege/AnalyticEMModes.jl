@@ -37,5 +37,6 @@ makedocs(modules = [AnalyticEMModes],
 
 deploydocs(
     repo = "github.com/uvegege/AnalyticEMModes.jl.git",
-    devbranch = "main"
+    devbranch = "main",
+    forcepush = true
 )
