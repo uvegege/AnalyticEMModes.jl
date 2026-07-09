@@ -6,3 +6,6 @@ Manifest*.toml
 local_tests*
 spherical_example
 Examples/*
+validate*
+*.pdf
+generate_images*

@@ -11,6 +11,7 @@ module AnalyticEMModes
     
     # Rectangular Coordinates
     include("./rectangularwg.jl") # Rectangular Waveguide
+    include("./ReflectionModes/triangularwg.jl") # Triangular Waveguides
 
     # Cylindrical Coordinates:
     include("./circularwg.jl") # Circular Waveguide
@@ -51,6 +52,13 @@ module AnalyticEMModes
     export cart2elliptic, metric_and_unit_elliptic, ce_m, se_m, Ce_m, Se_m
     
     export first_n_modes_rwg, first_n_modes_cwg, first_n_modes_coax, first_n_modes_radial, first_n_modes_ewg
+    export first_n_modes_equilateral, first_n_modes_right_isosceles, first_n_modes_half_equilateral
+    export EquilateralTriangle, RightIsoscelesTriangle, HalfEquilateralTriangle, ReflectionMode, TE, TM
+    export kc_equilateral, kc_right_isosceles, kc_half_equilateral
+    export kc, ψ, ∇ψ
+    export te_equilateral_fields, tm_equilateral_fields
+    export te_right_isosceles_fields, tm_right_isosceles_fields
+    export te_half_equilateral_fields, tm_half_equilateral_fields
 
     export kc_sph, te_sph_fields_lmax, tm_sph_fields_lmax, tm_sph_fields, te_sph_fields, te_normalization_sph, tm_normalization_sph
     export first_n_modes_sph, spherical_to_cartesian_fields, to_svector

@@ -15,6 +15,7 @@ makedocs(modules = [AnalyticEMModes],
         "Examples" => Any[
             "Gallery" => "Examples.md",
             "Rectangular" => "Rectangular/rectangular.md",
+            "Triangular" => "Triangular/triangular.md",
             "Cylindrical" => Any[
                 "Circular Waveguides" => "Cylindrical/Circular.md",
                 "Coaxial Waveguides" => "Cylindrical/Coaxial.md",

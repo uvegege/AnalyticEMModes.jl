@@ -32,6 +32,27 @@ te_normalization_rwg
 tm_normalization_rwg
 ```
 
+## Triangular waveguides
+
+```@docs
+EquilateralTriangle
+RightIsoscelesTriangle
+HalfEquilateralTriangle
+ReflectionMode
+kc_equilateral
+kc_right_isosceles
+kc_half_equilateral
+first_n_modes_equilateral
+first_n_modes_right_isosceles
+first_n_modes_half_equilateral
+te_equilateral_fields
+tm_equilateral_fields
+te_right_isosceles_fields
+tm_right_isosceles_fields
+te_half_equilateral_fields
+tm_half_equilateral_fields
+```
+
 
 ## Circular waveguide
 
