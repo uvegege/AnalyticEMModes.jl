@@ -221,7 +221,7 @@ kc_half_equilateral(side, m, n) = kc_equilateral(side, m, n)
 kc(mode::ReflectionMode{<:HalfEquilateralTriangle}) = kc_half_equilateral(mode.triangle.side, mode.m, mode.n)
 
 function scalar_integral(mode::ReflectionMode{<:EquilateralTriangle})
-    area = sqrt(3) * mode.triangle.side^2 / 4
+    area = sqrt(3) * mode.triangle.side^2 / 4   
     mode.m + mode.n == 0 && return zero(area)
     mode.symmetry == :A && mode.m == mode.n && return zero(area)
     mode.kind == :TM && (mode.m == 0 || mode.n == 0) && return zero(area)
