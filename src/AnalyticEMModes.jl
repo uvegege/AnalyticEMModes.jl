@@ -59,6 +59,9 @@ module AnalyticEMModes
     export te_equilateral_fields, tm_equilateral_fields
     export te_right_isosceles_fields, tm_right_isosceles_fields
     export te_half_equilateral_fields, tm_half_equilateral_fields
+    export te_normalization_equilateral, tm_normalization_equilateral
+    export te_normalization_right_isosceles, tm_normalization_right_isosceles
+    export te_normalization_half_equilateral, tm_normalization_half_equilateral
 
     export kc_sph, te_sph_fields_lmax, tm_sph_fields_lmax, tm_sph_fields, te_sph_fields, te_normalization_sph, tm_normalization_sph
     export first_n_modes_sph, spherical_to_cartesian_fields, to_svector

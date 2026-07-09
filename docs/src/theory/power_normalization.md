@@ -436,6 +436,109 @@ The normalization factor follows the same expression as in the other waveguide t
 F_0 = \sqrt{\frac{2}{P}}
 ```
 
+## Power normalization in Triangular Waveguides
+
+Triangular waveguides use the same transverse-field convention as rectangular
+waveguides. If ``\psi`` is the scalar transverse Helmholtz mode,
+
+```math
+\nabla_t^2 \psi + k_c^2 \psi = 0,
+```
+
+then the implemented fields give
+
+```math
+P_{\mathrm{TE}} =
+\frac{1}{2}\frac{\beta\omega\mu}{k_c^4}
+\int_\Omega |\nabla_t\psi|^2\,dA,
+\qquad
+P_{\mathrm{TM}} =
+\frac{1}{2}\frac{\beta\omega\varepsilon}{k_c^4}
+\int_\Omega |\nabla_t\psi|^2\,dA.
+```
+
+For PEC TE/TM modes, the boundary term vanishes after integration by parts, so
+
+```math
+\int_\Omega |\nabla_t\psi|^2\,dA =
+k_c^2 \int_\Omega |\psi|^2\,dA.
+```
+
+Defining
+
+```math
+I_\psi = \int_\Omega |\psi|^2\,dA,
+```
+
+the unnormalized modal powers become
+
+```math
+P_{\mathrm{TE}} =
+\frac{1}{2}\frac{\beta\omega\mu}{k_c^2} I_\psi,
+\qquad
+P_{\mathrm{TM}} =
+\frac{1}{2}\frac{\beta\omega\varepsilon}{k_c^2} I_\psi.
+```
+
+Therefore the unit-power normalization factors implemented for triangular modes
+are
+
+```math
+F_{0,\mathrm{TE}} =
+\sqrt{\frac{2k_c^2}{\beta\omega\mu I_\psi}},
+\qquad
+F_{0,\mathrm{TM}} =
+\sqrt{\frac{2k_c^2}{\beta\omega\varepsilon I_\psi}}.
+```
+
+Only the scalar norm ``I_\psi`` depends on the triangular geometry and on the
+selected reflected branch.
+
+### Equilateral triangle
+
+Let ``A = \sqrt{3}a^2/4`` be the area. For non-zero equilateral modes,
+
+```math
+I_\psi =
+\begin{cases}
+\frac{3A}{2}, & \text{if one index is zero or } m=n,\\
+\frac{3A}{4}, & \text{otherwise}.
+\end{cases}
+```
+
+The zero branches are excluded in the mode catalogue: antisymmetric modes with
+``m=n`` vanish, and TM modes with a zero index vanish.
+
+### Right isosceles triangle
+
+Let ``A = a^2/2`` be the area. For the non-zero modes,
+
+```math
+I_\psi =
+\begin{cases}
+A, & \text{if one index is zero or } m=n,\\
+\frac{A}{2}, & \text{otherwise}.
+\end{cases}
+```
+
+TM modes with ``m=0``, ``n=0``, or ``m=n`` vanish.
+
+### Half-equilateral triangle
+
+Let ``A = \sqrt{3}a^2/8`` be the area. For the non-zero modes,
+
+```math
+I_\psi =
+\begin{cases}
+\frac{3A}{2}, & \text{if one index is zero or } m=n,\\
+\frac{3A}{4}, & \text{otherwise}.
+\end{cases}
+```
+
+As in the implementation, TE modes are inherited from symmetric equilateral
+modes and TM modes from antisymmetric equilateral modes. The TM branches with a
+zero index or ``m=n`` vanish.
+
 ## Spherical Modes
 
 For spherical modes, the implemented power normalization uses the radial complex

@@ -57,7 +57,8 @@ For the right isosceles triangle, the modes are inherited from a square and
 k_c = \frac{\pi}{a}\sqrt{m^2 + n^2}.
 ```
 
-The procedural API mirrors the existing waveguide functions:
+The cutoff functions follow the naming convention used by the other waveguide
+families:
 
 ```julia
 kc_equilateral(side, m, n)
@@ -98,6 +99,29 @@ fields_tm = tm_half_equilateral_fields(x, y, side, m, n, freq, 1.0, 1.0)
 
 Each call returns `(Ex, Ey, Ez, Hx, Hy, Hz)`. For TE modes the longitudinal
 scalar is `Hz`; for TM modes it is `Ez`, as in the rectangular waveguide API.
+
+## Power Normalization
+
+Triangular modes provide the same unit-power normalization convention used by
+the other waveguide families. The normalization functions return the amplitude
+factor that scales the unnormalized fields to one watt of transmitted power.
+
+```julia
+kc = kc_equilateral(side, m, n)
+β = phase_constant(kc, freq, 1.0, 1.0)
+
+Nte = te_normalization_equilateral(side, m, n, :S, kc, β, freq, 1.0, 1.0)
+Ntm = tm_normalization_equilateral(side, m, n, :S, kc, β, freq, 1.0, 1.0)
+
+Nte = te_normalization_right_isosceles(side, m, n, kc, β, freq, 1.0, 1.0)
+Ntm = tm_normalization_right_isosceles(side, m, n, kc, β, freq, 1.0, 1.0)
+
+Nte = te_normalization_half_equilateral(side, m, n, kc, β, freq, 1.0, 1.0)
+Ntm = tm_normalization_half_equilateral(side, m, n, kc, β, freq, 1.0, 1.0)
+```
+
+Internally, the power is computed from the transverse Poynting flux using the
+closed-form scalar norms of the reflected triangular modes.
 
 The lower-level mode API can also be used when the scalar Helmholtz function is
 needed directly:

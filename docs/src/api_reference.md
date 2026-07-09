@@ -51,6 +51,12 @@ te_right_isosceles_fields
 tm_right_isosceles_fields
 te_half_equilateral_fields
 tm_half_equilateral_fields
+te_normalization_equilateral
+tm_normalization_equilateral
+te_normalization_right_isosceles
+tm_normalization_right_isosceles
+te_normalization_half_equilateral
+tm_normalization_half_equilateral
 ```
 
 

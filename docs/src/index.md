@@ -31,6 +31,7 @@ This package provides closed-form solutions for electric and magnetic field dist
 | Waveguide Type | Alias | Coordinate System | Power Normalization |
 |:---------------|:------|:------------------|:-------------------:|
 | Rectangular    | `rwg` | (x, y)           | Yes                 |
+| Triangular     | `tri` | (x, y) reference triangles | Yes          |
 | Circular       | `cwg` | (r, θ)           | Yes                 |
 | Coaxial        | `coax`| (r, θ)           | Yes                 |
 | Radial         | `radial`| (ρ, φ, z)      | Yes                 |
@@ -102,6 +103,7 @@ This documentation is organized as follows:
 - **[Coaxial Waveguides](Cylindrical/Coaxial.md)**: Including TEM mode
 - **[Radial & Wedge](Cylindrical/Radial.md)**: Radial propagation geometries
 - **[Rectangular Waveguides](Rectangular/rectangular.md)**: Standard rectangular guides
+- **[Triangular Waveguides](Triangular/triangular.md)**: Reflection modes in equilateral, right-isosceles, and half-equilateral guides
 - **[Elliptic Waveguides](Elliptic/elliptic.md)**: Mathieu function solutions
 - **[Spherical Modes](Spherical/spherical.md)**: Spherical vector waves and mode sets
 - **[Spheroidal Modes](Spheroidal/spheroidal.md)**: Prolate/oblate vector-wave families

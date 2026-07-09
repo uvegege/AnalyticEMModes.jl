@@ -220,6 +220,102 @@ kc_half_equilateral(side, m, n) = kc_equilateral(side, m, n)
 
 kc(mode::ReflectionMode{<:HalfEquilateralTriangle}) = kc_half_equilateral(mode.triangle.side, mode.m, mode.n)
 
+function scalar_integral(mode::ReflectionMode{<:EquilateralTriangle})
+    area = sqrt(3) * mode.triangle.side^2 / 4
+    mode.m + mode.n == 0 && return zero(area)
+    mode.symmetry == :A && mode.m == mode.n && return zero(area)
+    mode.kind == :TM && (mode.m == 0 || mode.n == 0) && return zero(area)
+    return mode.m == mode.n || mode.m == 0 || mode.n == 0 ? 3 * area / 2 : 3 * area / 4
+end
+
+function scalar_integral(mode::ReflectionMode{<:RightIsoscelesTriangle})
+    area = mode.triangle.side^2 / 2
+    mode.m + mode.n == 0 && return zero(area)
+    mode.kind == :TM && (mode.m == 0 || mode.n == 0 || mode.m == mode.n) && return zero(area)
+    return mode.m == mode.n || mode.m == 0 || mode.n == 0 ? area : area / 2
+end
+
+function scalar_integral(mode::ReflectionMode{<:HalfEquilateralTriangle})
+    area = sqrt(3) * mode.triangle.side^2 / 8
+    mode.m + mode.n == 0 && return zero(area)
+    mode.kind == :TM && (mode.m == 0 || mode.n == 0 || mode.m == mode.n) && return zero(area)
+    return mode.m == mode.n || mode.m == 0 || mode.n == 0 ? 3 * area / 2 : 3 * area / 4
+end
+
+function triangular_modal_power(mode::ReflectionMode, k, β, f, μᵣ, εᵣ)
+    ω = 2 * π * f
+    factor = mode.kind == :TE ? ω * μᵣ * _μₒ * β / k^2 : ω * εᵣ * _εₒ * β / k^2
+    return 0.5 * factor * scalar_integral(mode)
+end
+
+te_normalization(mode::ReflectionMode, β, f, μᵣ, εᵣ) = sqrt(1 / triangular_modal_power(mode, kc(mode), β, f, μᵣ, εᵣ))
+
+tm_normalization(mode::ReflectionMode, β, f, μᵣ, εᵣ) = sqrt(1 / triangular_modal_power(mode, kc(mode), β, f, μᵣ, εᵣ))
+
+"""
+    te_normalization_equilateral(side, m, n, symmetry, kc, β, f, μᵣ, εᵣ)
+
+Normalization factor for equilateral-triangle TE modes to achieve unit power.
+"""
+function te_normalization_equilateral(side, m, n, symmetry, kc, β, f, μᵣ, εᵣ)
+    mode = ReflectionMode(EquilateralTriangle(side), m, n, :TE, symmetry)
+    return sqrt(1 / triangular_modal_power(mode, kc, β, f, μᵣ, εᵣ))
+end
+
+te_normalization_equilateral(side, m, n, kc, β, f, μᵣ, εᵣ) = te_normalization_equilateral(side, m, n, :S, kc, β, f, μᵣ, εᵣ)
+
+"""
+    tm_normalization_equilateral(side, m, n, symmetry, kc, β, f, μᵣ, εᵣ)
+
+Normalization factor for equilateral-triangle TM modes to achieve unit power.
+"""
+function tm_normalization_equilateral(side, m, n, symmetry, kc, β, f, μᵣ, εᵣ)
+    mode = ReflectionMode(EquilateralTriangle(side), m, n, :TM, symmetry)
+    return sqrt(1 / triangular_modal_power(mode, kc, β, f, μᵣ, εᵣ))
+end
+
+tm_normalization_equilateral(side, m, n, kc, β, f, μᵣ, εᵣ) = tm_normalization_equilateral(side, m, n, :S, kc, β, f, μᵣ, εᵣ)
+
+"""
+    te_normalization_right_isosceles(side, m, n, kc, β, f, μᵣ, εᵣ)
+
+Normalization factor for right-isosceles-triangle TE modes to achieve unit power.
+"""
+function te_normalization_right_isosceles(side, m, n, kc, β, f, μᵣ, εᵣ)
+    mode = ReflectionMode(RightIsoscelesTriangle(side), m, n, :TE)
+    return sqrt(1 / triangular_modal_power(mode, kc, β, f, μᵣ, εᵣ))
+end
+
+"""
+    tm_normalization_right_isosceles(side, m, n, kc, β, f, μᵣ, εᵣ)
+
+Normalization factor for right-isosceles-triangle TM modes to achieve unit power.
+"""
+function tm_normalization_right_isosceles(side, m, n, kc, β, f, μᵣ, εᵣ)
+    mode = ReflectionMode(RightIsoscelesTriangle(side), m, n, :TM)
+    return sqrt(1 / triangular_modal_power(mode, kc, β, f, μᵣ, εᵣ))
+end
+
+"""
+    te_normalization_half_equilateral(side, m, n, kc, β, f, μᵣ, εᵣ)
+
+Normalization factor for half-equilateral-triangle TE modes to achieve unit power.
+"""
+function te_normalization_half_equilateral(side, m, n, kc, β, f, μᵣ, εᵣ)
+    mode = ReflectionMode(HalfEquilateralTriangle(side), m, n, :TE)
+    return sqrt(1 / triangular_modal_power(mode, kc, β, f, μᵣ, εᵣ))
+end
+
+"""
+    tm_normalization_half_equilateral(side, m, n, kc, β, f, μᵣ, εᵣ)
+
+Normalization factor for half-equilateral-triangle TM modes to achieve unit power.
+"""
+function tm_normalization_half_equilateral(side, m, n, kc, β, f, μᵣ, εᵣ)
+    mode = ReflectionMode(HalfEquilateralTriangle(side), m, n, :TM)
+    return sqrt(1 / triangular_modal_power(mode, kc, β, f, μᵣ, εᵣ))
+end
+
 """
     first_n_modes_equilateral(N, side)
 

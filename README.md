@@ -26,6 +26,7 @@ pkg> add AnalyticEMModes
 | Type | Alias | Coordinate System | Power Normalization |
 |:---------------|:------|:------------------|:-------------------:|
 | Rectangular    | `rwg` | (x, y)           | ✓                   |
+| Triangular     | `tri` | (x, y) reference triangles | ✓            |
 | Circular       | `cwg` | (r, θ)           | ✓                   |
 | Coaxial        | `coax`| (r, θ)           | ✓                   |
 | Radial         | `radial`| (ρ, φ, z)      | ✓                   |
