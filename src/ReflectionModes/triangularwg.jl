@@ -331,9 +331,6 @@ function first_n_modes_equilateral(N, side)
     max_index = 1
     while true
         empty!(modes)
-        # The equilateral symmetry group has no orientation family larger than
-        # two dimensions; `:S` and `:A` span the generic pair, while `(n, m)`
-        # repeats `(m, n)` up to sign.
         for m in 0:max_index, n in m:max_index
             m + n == 0 && continue
             push!(modes, (:TE, m, n, :S, kc_equilateral(side, m, n)))
