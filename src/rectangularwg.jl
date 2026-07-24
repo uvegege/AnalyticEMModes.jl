@@ -78,11 +78,11 @@ function te_rwg_fields(x, y, a, b, m, n, c_e, c_h)
    
     ∂ψᵢ, ∂ψⱼ, ψₖ = te_rwg_modal_f(x, y, a, b, m, n)
 
-    Ex = -c_e * ∂ψᵢ
-    Ey = +c_e * ∂ψⱼ
+    Ex = -c_e * ∂ψⱼ
+    Ey = +c_e * ∂ψᵢ
     Ez = zero(Ex)
-    Hx = -c_h * ∂ψⱼ
-    Hy = -c_h * ∂ψᵢ
+    Hx = -c_h * ∂ψᵢ
+    Hy = -c_h * ∂ψⱼ
     Hz =  -im *  ψₖ
 
     return (Ex, Ey, Ez, Hx, Hy, Hz)

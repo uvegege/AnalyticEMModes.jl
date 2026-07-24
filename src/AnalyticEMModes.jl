@@ -1,6 +1,5 @@
 module AnalyticEMModes
 
-
     using Bessels
     using MathieuF
     using SpheriCart
@@ -21,6 +20,7 @@ module AnalyticEMModes
 
     # Elliptic Coordinates
     include("./ellipticalwg.jl") 
+    include("./elliptic_radialwg.jl")
     
     # Spherical Coordinates
     include("./spherical.jl")
@@ -50,12 +50,13 @@ module AnalyticEMModes
     export kc_ewg, te_ewg_fields, tm_ewg_fields
     export te_normalization_ewg, tm_normalization_ewg
     export cart2elliptic, metric_and_unit_elliptic, ce_m, se_m, Ce_m, Se_m
+    export kt_elliptic_radial, phase_constant_elliptic_radial, cutoff_frequency_elliptic_radial
+    export te_elliptic_radial_fields, tm_elliptic_radial_fields
+    export te_normalization_elliptic_radial, tm_normalization_elliptic_radial, first_n_modes_elliptic_radial
     
     export first_n_modes_rwg, first_n_modes_cwg, first_n_modes_coax, first_n_modes_radial, first_n_modes_ewg
     export first_n_modes_equilateral, first_n_modes_right_isosceles, first_n_modes_half_equilateral
-    export EquilateralTriangle, RightIsoscelesTriangle, HalfEquilateralTriangle, ReflectionMode, TE, TM
     export kc_equilateral, kc_right_isosceles, kc_half_equilateral
-    export kc, ψ, ∇ψ
     export te_equilateral_fields, tm_equilateral_fields
     export te_right_isosceles_fields, tm_right_isosceles_fields
     export te_half_equilateral_fields, tm_half_equilateral_fields
@@ -69,6 +70,7 @@ module AnalyticEMModes
     export m_normalization_sph, n_normalization_sph, te_from_mn_sph, tm_from_mn_sph
     export sph2cart
     
+    export kc_spheroidal
     export mn_spheroidal_vector, m_spheroidal_vector, n_spheroidal_vector
     export mn_spheroidal_vectors, m_spheroidal_vectors, n_spheroidal_vectors
     export mn_spheroidal_vectors_mnmax

@@ -1,25 +1,3 @@
-"""
-    CircularSector(radius, angle)
-
-Circular-sector PEC waveguide with `0 <= r <= radius` and `0 <= ϕ <= angle`.
-"""
-struct CircularSector{T}
-    radius::T
-    angle::T
-end
-
-"""
-    AnnularSector(inner_radius, outer_radius, angle)
-
-Annular-sector PEC waveguide with `inner_radius <= r <= outer_radius` and
-`0 <= ϕ <= angle`.
-"""
-struct AnnularSector{T}
-    inner_radius::T
-    outer_radius::T
-    angle::T
-end
-
 sector_order(p, ϕ0) = p * π / ϕ0
 
 function check_sector_kind(kind)
@@ -197,7 +175,6 @@ function kc_sector(radius, angle, p, n, kind)
     return x / radius
 end
 
-kc(mode::CircularSector, p, n, kind) = kc_sector(mode.radius, mode.angle, p, n, kind)
 characteristic_annular_sector_tm(ν, kc, b, a) = characteristic_coax_equation_tm(ν, kc, a, b)
 characteristic_annular_sector_te(ν, kc, b, a) = characteristic_coax_equation_te(ν, kc, a, b)
 
@@ -218,8 +195,6 @@ function kc_annular_sector(inner_radius, outer_radius, angle, p, n, kind)
     ν = sector_order(p, angle)
     return annular_sector_zero(ν, inner_radius, outer_radius, n, kind)
 end
-
-kc(mode::AnnularSector, p, n, kind) = kc_annular_sector(mode.inner_radius, mode.outer_radius, mode.angle, p, n, kind)
 
 function sector_angular(ϕ, ν, kind)
     if kind == :TE

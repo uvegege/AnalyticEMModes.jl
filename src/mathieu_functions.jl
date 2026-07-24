@@ -536,7 +536,7 @@ function mathieu_a_coeff(order, q_param, a_param, N)
     trivial_cases!(coeff, q_param, order, 0) && return coeff
 
     # Forward recurrence
-    if order < 5
+    if order < 4 # order < 4 works better than order < 5 for small q and m > 10 when used with Schaefke addition theorem
         ratio, nn, sum_val = low_order(a_param, q_param, even_odd, false)
     else
         ratio, nn, sum_val = forward_recurrence!(coeff, order, a_param, q_param, even_odd, false)

@@ -535,16 +535,16 @@ end
 @inline function _simpson(f, a, b)
     c = (a + b)/2
     h = b - a
-    (h/6) * (f(a) + 4*f(c) + f(b))
+    return (h/6) * (f(a) + 4*f(c) + f(b))
 end
 
-function _adapt_simpson(f, a, b, fa, fb, fc, S, tol, depth)
+function _adapt_simpson(f::F, a, b, fa, fb, fc, S, tol, depth) where F
     c  = (a + b)/2
     d  = (a + c)/2
     e  = (c + b)/2
     fd = f(d)
     fe = f(e)
-    Sleft  = (c - a)/6 * (fa + 4*fd + fc)
+    Sleft = (c - a)/6 * (fa + 4*fd + fc)
     Sright = (b - c)/6 * (fc + 4*fe + fb)
     S2 = Sleft + Sright
     if depth <= 0 || abs(S2 - S) ≤ 15*tol
@@ -554,12 +554,12 @@ function _adapt_simpson(f, a, b, fa, fb, fc, S, tol, depth)
            _adapt_simpson(f, c, b, fc, fb, fe, Sright, tol/2, depth-1)
 end
 
-function quad_asimpson(f, a, b; rtol=1e-10, atol=0.0, maxdepth=20)
+function quad_asimpson(f::F, a, b; rtol=1e-10, atol=0.0, maxdepth=20) where F
     fa = f(a)
     fb = f(b)
-    c  = (a + b)/2
+    c = (a + b)/2
     fc = f(c)
-    S  = (b - a)/6 * (fa + 4*fc + fb)
+    S = (b - a)/6 * (fa + 4*fc + fb)
     tol = max(atol, rtol*abs(S))
     _adapt_simpson(f, a, b, fa, fb, fc, S, tol, maxdepth)
 end

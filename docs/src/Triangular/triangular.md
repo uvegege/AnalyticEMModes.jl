@@ -20,13 +20,7 @@ reference cross-section.
 ## Reference Geometries
 
 The triangular modes are defined on fixed reference domains. The side length is
-the only geometric parameter.
-
-```julia
-EquilateralTriangle(side)
-RightIsoscelesTriangle(side)
-HalfEquilateralTriangle(side)
-```
+the only geometric parameter and is passed directly to the cutoff, modal, field, and normalization functions.
 
 The equilateral triangle has vertices `(0, 0)`, `(side, 0)`, and
 `(side / 2, sqrt(3) * side / 2)`. The right isosceles triangle has vertices
@@ -123,21 +117,10 @@ Ntm = tm_normalization_half_equilateral(side, m, n, kc, β, freq, 1.0, 1.0)
 Internally, the power is computed from the transverse Poynting flux using the
 closed-form scalar norms of the reflected triangular modes.
 
-The lower-level mode API can also be used when the scalar Helmholtz function is
-needed directly:
-
-```julia
-triangle = EquilateralTriangle(side)
-mode = TE(triangle, m, n; symmetry = :S)
-
-kc(mode)
-ψ(mode, x, y)
-∇ψ(mode, x, y)
-```
-
-For equilateral triangles, `symmetry = :S` and `symmetry = :A` select the
-symmetric and antisymmetric families with respect to the reference median. The
-right isosceles and half-equilateral wrappers select the appropriate symmetry
+For equilateral triangles, the lower-level modal functions accept an optional
+`symmetry` argument. The values `:S` and `:A` select the symmetric and
+antisymmetric families with respect to the reference median. The right
+isosceles and half-equilateral field functions select the appropriate symmetry
 internally.
 
 ## Analytical Results

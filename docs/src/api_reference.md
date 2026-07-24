@@ -35,10 +35,6 @@ tm_normalization_rwg
 ## Triangular waveguides
 
 ```@docs
-EquilateralTriangle
-RightIsoscelesTriangle
-HalfEquilateralTriangle
-ReflectionMode
 kc_equilateral
 kc_right_isosceles
 kc_half_equilateral

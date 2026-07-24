@@ -1,62 +1,3 @@
-"""
-    ReflectionTriangle
-
-Abstract type for triangular waveguides whose scalar Helmholtz modes are built
-from reflection symmetries.
-"""
-abstract type ReflectionTriangle end
-
-"""
-    EquilateralTriangle(side)
-
-Equilateral triangular cross-section with side length `side`.
-
-The reference triangle has vertices `(0, 0)`, `(side, 0)`, and
-`(side / 2, sqrt(3) * side / 2)`.
-"""
-struct EquilateralTriangle{T} <: ReflectionTriangle
-    side::T
-end
-
-"""
-    RightIsoscelesTriangle(side)
-
-Right isosceles triangular cross-section obtained by cutting a square of side
-`side` along the diagonal `x = y`.
-"""
-struct RightIsoscelesTriangle{T} <: ReflectionTriangle
-    side::T
-end
-
-"""
-    HalfEquilateralTriangle(side)
-
-30-60-90 triangular cross-section represented as half of an equilateral triangle
-of side length `side`.
-"""
-struct HalfEquilateralTriangle{T} <: ReflectionTriangle
-    side::T
-end
-
-"""
-    ReflectionMode(triangle, m, n, kind)
-
-Scalar reflection mode on a triangular waveguide. `kind` must be `:TE` or `:TM`.
-"""
-struct ReflectionMode{G <: ReflectionTriangle}
-    triangle::G
-    m::Int
-    n::Int
-    kind::Symbol
-    symmetry::Symbol
-end
-
-TE(triangle::ReflectionTriangle, m, n; symmetry=:S) = ReflectionMode(triangle, Int(m), Int(n), :TE, symmetry)
-
-TM(triangle::ReflectionTriangle, m, n; symmetry=:S) = ReflectionMode(triangle, Int(m), Int(n), :TM, symmetry)
-
-ReflectionMode(triangle::ReflectionTriangle, m, n, kind::Symbol) = ReflectionMode(triangle, Int(m), Int(n), kind, :S)
-
 function check_modekind(kind)
     if !(kind == :TE || kind == :TM)
         throw(ArgumentError("mode kind must be :TE or :TM"))
@@ -77,8 +18,6 @@ end
 Cutoff wavenumber of the `(m, n)` equilateral-triangle mode.
 """
 kc_equilateral(side, m, n) = 4 * π / (3 * side) * sqrt(m^2 + m * n + n^2)
-
-kc(mode::ReflectionMode{<:EquilateralTriangle}) = kc_equilateral(mode.triangle.side, mode.m, mode.n)
 
 function equilateral_tm_modal_f(u, v, side, m, n)
     return equilateral_tm_modal_f(u, v, side, m, n, :S)
@@ -150,22 +89,15 @@ function equilateral_te_modal_f(u, v, side, m, n, symmetry)
     return (∂ψᵢ, ∂ψⱼ, ψₖ)
 end
 
-function equilateral_modal_f(x, y, triangle::EquilateralTriangle, m, n, kind)
-    return equilateral_modal_f(x, y, triangle, m, n, kind, :S)
+function equilateral_modal_f(x, y, side, m, n, kind)
+    return equilateral_modal_f(x, y, side, m, n, kind, :S)
 end
 
-function equilateral_modal_f(x, y, triangle::EquilateralTriangle, m, n, kind, symmetry)
+function equilateral_modal_f(x, y, side, m, n, kind, symmetry)
     check_modekind(kind)
     check_symmetry(symmetry)
-    return kind == :TE ? equilateral_te_modal_f(x, y, triangle.side, m, n, symmetry) : equilateral_tm_modal_f(x, y, triangle.side, m, n, symmetry)
+    return kind == :TE ? equilateral_te_modal_f(x, y, side, m, n, symmetry) : equilateral_tm_modal_f(x, y, side, m, n, symmetry)
 end
-
-equilateral_modal_f(x, y, side, m, n, kind) = equilateral_modal_f(x, y, EquilateralTriangle(side), m, n, kind)
-equilateral_modal_f(x, y, side, m, n, kind, symmetry) = equilateral_modal_f(x, y, EquilateralTriangle(side), m, n, kind, symmetry)
-
-ψ(mode::ReflectionMode{<:EquilateralTriangle}, x, y) = equilateral_modal_f(x, y, mode.triangle, mode.m, mode.n, mode.kind, mode.symmetry)[3]
-
-∇ψ(mode::ReflectionMode{<:EquilateralTriangle}, x, y) = equilateral_modal_f(x, y, mode.triangle, mode.m, mode.n, mode.kind, mode.symmetry)[1:2]
 
 """
     kc_right_isosceles(side, m, n)
@@ -173,8 +105,6 @@ equilateral_modal_f(x, y, side, m, n, kind, symmetry) = equilateral_modal_f(x, y
 Cutoff wavenumber of the `(m, n)` right-isosceles-triangle mode.
 """
 kc_right_isosceles(side, m, n) = π / side * hypot(m, n)
-
-kc(mode::ReflectionMode{<:RightIsoscelesTriangle}) = kc_right_isosceles(mode.triangle.side, mode.m, mode.n)
 
 function square_tm_f(u, v, side, m, n)
     ∂x, ∂y, ψₖ = tm_rwg_modal_f(u, v, side, side, m, n)
@@ -186,16 +116,16 @@ function square_te_f(u, v, side, m, n)
     return (∂x, ∂y, ψₖ)
 end
 
-function right_isosceles_modal_f(x, y, triangle::RightIsoscelesTriangle, m, n, kind)
+function right_isosceles_modal_f(x, y, side, m, n, kind)
     check_modekind(kind)
 
     if kind == :TE
-        ∂mn_x, ∂mn_y, ψmn = square_te_f(x, y, triangle.side, m, n)
-        ∂nm_x, ∂nm_y, ψnm = square_te_f(x, y, triangle.side, n, m)
+        ∂mn_x, ∂mn_y, ψmn = square_te_f(x, y, side, m, n)
+        ∂nm_x, ∂nm_y, ψnm = square_te_f(x, y, side, n, m)
         s = one(ψmn)
     else
-        ∂mn_x, ∂mn_y, ψmn = square_tm_f(x, y, triangle.side, m, n)
-        ∂nm_x, ∂nm_y, ψnm = square_tm_f(x, y, triangle.side, n, m)
+        ∂mn_x, ∂mn_y, ψmn = square_tm_f(x, y, side, m, n)
+        ∂nm_x, ∂nm_y, ψnm = square_tm_f(x, y, side, n, m)
         s = -one(ψmn)
     end
 
@@ -205,12 +135,6 @@ function right_isosceles_modal_f(x, y, triangle::RightIsoscelesTriangle, m, n, k
     return (∂x, ∂y, ψₖ)
 end
 
-right_isosceles_modal_f(x, y, side, m, n, kind) = right_isosceles_modal_f(x, y, RightIsoscelesTriangle(side), m, n, kind)
-
-ψ(mode::ReflectionMode{<:RightIsoscelesTriangle}, x, y) = right_isosceles_modal_f(x, y, mode.triangle, mode.m, mode.n, mode.kind)[3]
-
-∇ψ(mode::ReflectionMode{<:RightIsoscelesTriangle}, x, y) = right_isosceles_modal_f(x, y, mode.triangle, mode.m, mode.n, mode.kind)[1:2]
-
 """
     kc_half_equilateral(side, m, n)
 
@@ -218,39 +142,33 @@ Cutoff wavenumber inherited from the corresponding equilateral mode.
 """
 kc_half_equilateral(side, m, n) = kc_equilateral(side, m, n)
 
-kc(mode::ReflectionMode{<:HalfEquilateralTriangle}) = kc_half_equilateral(mode.triangle.side, mode.m, mode.n)
-
-function scalar_integral(mode::ReflectionMode{<:EquilateralTriangle})
-    area = sqrt(3) * mode.triangle.side^2 / 4   
-    mode.m + mode.n == 0 && return zero(area)
-    mode.symmetry == :A && mode.m == mode.n && return zero(area)
-    mode.kind == :TM && (mode.m == 0 || mode.n == 0) && return zero(area)
-    return mode.m == mode.n || mode.m == 0 || mode.n == 0 ? 3 * area / 2 : 3 * area / 4
+function scalar_integral_equilateral(side, m, n, kind, symmetry)
+    area = sqrt(3) * side^2 / 4
+    m + n == 0 && return zero(area)
+    symmetry == :A && m == n && return zero(area)
+    kind == :TM && (m == 0 || n == 0) && return zero(area)
+    return m == n || m == 0 || n == 0 ? 3 * area / 2 : 3 * area / 4
 end
 
-function scalar_integral(mode::ReflectionMode{<:RightIsoscelesTriangle})
-    area = mode.triangle.side^2 / 2
-    mode.m + mode.n == 0 && return zero(area)
-    mode.kind == :TM && (mode.m == 0 || mode.n == 0 || mode.m == mode.n) && return zero(area)
-    return mode.m == mode.n || mode.m == 0 || mode.n == 0 ? area : area / 2
+function scalar_integral_right_isosceles(side, m, n, kind)
+    area = side^2 / 2
+    m + n == 0 && return zero(area)
+    kind == :TM && (m == 0 || n == 0 || m == n) && return zero(area)
+    return m == n || m == 0 || n == 0 ? area : area / 2
 end
 
-function scalar_integral(mode::ReflectionMode{<:HalfEquilateralTriangle})
-    area = sqrt(3) * mode.triangle.side^2 / 8
-    mode.m + mode.n == 0 && return zero(area)
-    mode.kind == :TM && (mode.m == 0 || mode.n == 0 || mode.m == mode.n) && return zero(area)
-    return mode.m == mode.n || mode.m == 0 || mode.n == 0 ? 3 * area / 2 : 3 * area / 4
+function scalar_integral_half_equilateral(side, m, n, kind)
+    area = sqrt(3) * side^2 / 8
+    m + n == 0 && return zero(area)
+    kind == :TM && (m == 0 || n == 0 || m == n) && return zero(area)
+    return m == n || m == 0 || n == 0 ? 3 * area / 2 : 3 * area / 4
 end
 
-function triangular_modal_power(mode::ReflectionMode, k, β, f, μᵣ, εᵣ)
+function triangular_modal_power(kind, scalar_integral, k, β, f, μᵣ, εᵣ)
     ω = 2 * π * f
-    factor = mode.kind == :TE ? ω * μᵣ * _μₒ * β / k^2 : ω * εᵣ * _εₒ * β / k^2
-    return 0.5 * factor * scalar_integral(mode)
+    factor = kind == :TE ? ω * μᵣ * _μₒ * β / k^2 : ω * εᵣ * _εₒ * β / k^2
+    return 0.5 * factor * scalar_integral
 end
-
-te_normalization(mode::ReflectionMode, β, f, μᵣ, εᵣ) = sqrt(1 / triangular_modal_power(mode, kc(mode), β, f, μᵣ, εᵣ))
-
-tm_normalization(mode::ReflectionMode, β, f, μᵣ, εᵣ) = sqrt(1 / triangular_modal_power(mode, kc(mode), β, f, μᵣ, εᵣ))
 
 """
     te_normalization_equilateral(side, m, n, symmetry, kc, β, f, μᵣ, εᵣ)
@@ -258,8 +176,8 @@ tm_normalization(mode::ReflectionMode, β, f, μᵣ, εᵣ) = sqrt(1 / triangula
 Normalization factor for equilateral-triangle TE modes to achieve unit power.
 """
 function te_normalization_equilateral(side, m, n, symmetry, kc, β, f, μᵣ, εᵣ)
-    mode = ReflectionMode(EquilateralTriangle(side), m, n, :TE, symmetry)
-    return sqrt(1 / triangular_modal_power(mode, kc, β, f, μᵣ, εᵣ))
+    check_symmetry(symmetry)
+    return sqrt(1 / triangular_modal_power(:TE, scalar_integral_equilateral(side, m, n, :TE, symmetry), kc, β, f, μᵣ, εᵣ))
 end
 
 te_normalization_equilateral(side, m, n, kc, β, f, μᵣ, εᵣ) = te_normalization_equilateral(side, m, n, :S, kc, β, f, μᵣ, εᵣ)
@@ -270,8 +188,8 @@ te_normalization_equilateral(side, m, n, kc, β, f, μᵣ, εᵣ) = te_normaliza
 Normalization factor for equilateral-triangle TM modes to achieve unit power.
 """
 function tm_normalization_equilateral(side, m, n, symmetry, kc, β, f, μᵣ, εᵣ)
-    mode = ReflectionMode(EquilateralTriangle(side), m, n, :TM, symmetry)
-    return sqrt(1 / triangular_modal_power(mode, kc, β, f, μᵣ, εᵣ))
+    check_symmetry(symmetry)
+    return sqrt(1 / triangular_modal_power(:TM, scalar_integral_equilateral(side, m, n, :TM, symmetry), kc, β, f, μᵣ, εᵣ))
 end
 
 tm_normalization_equilateral(side, m, n, kc, β, f, μᵣ, εᵣ) = tm_normalization_equilateral(side, m, n, :S, kc, β, f, μᵣ, εᵣ)
@@ -282,8 +200,7 @@ tm_normalization_equilateral(side, m, n, kc, β, f, μᵣ, εᵣ) = tm_normaliza
 Normalization factor for right-isosceles-triangle TE modes to achieve unit power.
 """
 function te_normalization_right_isosceles(side, m, n, kc, β, f, μᵣ, εᵣ)
-    mode = ReflectionMode(RightIsoscelesTriangle(side), m, n, :TE)
-    return sqrt(1 / triangular_modal_power(mode, kc, β, f, μᵣ, εᵣ))
+    return sqrt(1 / triangular_modal_power(:TE, scalar_integral_right_isosceles(side, m, n, :TE), kc, β, f, μᵣ, εᵣ))
 end
 
 """
@@ -292,8 +209,7 @@ end
 Normalization factor for right-isosceles-triangle TM modes to achieve unit power.
 """
 function tm_normalization_right_isosceles(side, m, n, kc, β, f, μᵣ, εᵣ)
-    mode = ReflectionMode(RightIsoscelesTriangle(side), m, n, :TM)
-    return sqrt(1 / triangular_modal_power(mode, kc, β, f, μᵣ, εᵣ))
+    return sqrt(1 / triangular_modal_power(:TM, scalar_integral_right_isosceles(side, m, n, :TM), kc, β, f, μᵣ, εᵣ))
 end
 
 """
@@ -302,8 +218,7 @@ end
 Normalization factor for half-equilateral-triangle TE modes to achieve unit power.
 """
 function te_normalization_half_equilateral(side, m, n, kc, β, f, μᵣ, εᵣ)
-    mode = ReflectionMode(HalfEquilateralTriangle(side), m, n, :TE)
-    return sqrt(1 / triangular_modal_power(mode, kc, β, f, μᵣ, εᵣ))
+    return sqrt(1 / triangular_modal_power(:TE, scalar_integral_half_equilateral(side, m, n, :TE), kc, β, f, μᵣ, εᵣ))
 end
 
 """
@@ -312,8 +227,7 @@ end
 Normalization factor for half-equilateral-triangle TM modes to achieve unit power.
 """
 function tm_normalization_half_equilateral(side, m, n, kc, β, f, μᵣ, εᵣ)
-    mode = ReflectionMode(HalfEquilateralTriangle(side), m, n, :TM)
-    return sqrt(1 / triangular_modal_power(mode, kc, β, f, μᵣ, εᵣ))
+    return sqrt(1 / triangular_modal_power(:TM, scalar_integral_half_equilateral(side, m, n, :TM), kc, β, f, μᵣ, εᵣ))
 end
 
 """
@@ -399,29 +313,23 @@ function first_n_modes_half_equilateral(N, side)
     return modes[1:N]
 end
 
-function half_equilateral_modal_f(x, y, triangle::HalfEquilateralTriangle, m, n, kind)
+function half_equilateral_modal_f(x, y, side, m, n, kind)
     check_modekind(kind)
     if kind == :TE
-        ∂x, ∂y, ψₖ = equilateral_te_modal_f(x + triangle.side / 2, y, triangle.side, m, n, :S)
+        ∂x, ∂y, ψₖ = equilateral_te_modal_f(x + side / 2, y, side, m, n, :S)
     else
-        ∂x, ∂y, ψₖ = equilateral_tm_modal_f(x + triangle.side / 2, y, triangle.side, m, n, :A)
+        ∂x, ∂y, ψₖ = equilateral_tm_modal_f(x + side / 2, y, side, m, n, :A)
     end
 
     return (∂x, ∂y, ψₖ)
 end
 
-half_equilateral_modal_f(x, y, side, m, n, kind) = half_equilateral_modal_f(x, y, HalfEquilateralTriangle(side), m, n, kind)
-
-ψ(mode::ReflectionMode{<:HalfEquilateralTriangle}, x, y) = half_equilateral_modal_f(x, y, mode.triangle, mode.m, mode.n, mode.kind)[3]
-
-∇ψ(mode::ReflectionMode{<:HalfEquilateralTriangle}, x, y) = half_equilateral_modal_f(x, y, mode.triangle, mode.m, mode.n, mode.kind)[1:2]
-
 function te_reflection_fields_from_modal(∂ψᵢ, ∂ψⱼ, ψₖ, c_e, c_h)
-    Ex = -c_e * ∂ψᵢ
-    Ey = +c_e * ∂ψⱼ
+    Ex = -c_e * ∂ψⱼ
+    Ey = +c_e * ∂ψᵢ
     Ez = zero(Ex)
-    Hx = -c_h * ∂ψⱼ
-    Hy = -c_h * ∂ψᵢ
+    Hx = -c_h * ∂ψᵢ
+    Hy = -c_h * ∂ψⱼ
     Hz = -im * ψₖ
     return (Ex, Ey, Ez, Hx, Hy, Hz)
 end
@@ -434,66 +342,6 @@ function tm_reflection_fields_from_modal(∂ψᵢ, ∂ψⱼ, ψₖ, c_e, c_h)
     Hy = -c_h * ∂ψᵢ
     Hz = zero(Ex)
     return (Ex, Ey, Ez, Hx, Hy, Hz)
-end
-
-function te_reflection_fields(mode::ReflectionMode, x, y, c_e, c_h)
-    mode.kind == :TE || throw(ArgumentError("mode kind must be :TE"))
-    ∂ψᵢ, ∂ψⱼ, ψₖ = modal_f(mode, x, y)
-    return te_reflection_fields_from_modal(∂ψᵢ, ∂ψⱼ, ψₖ, c_e, c_h)
-end
-
-function te_reflection_fields(mode::ReflectionMode, x, y, f, μᵣ, εᵣ)
-    k = kc(mode)
-    β = phase_constant(k, f, μᵣ, εᵣ)
-    c_e, c_h = te_coefficients(k, β, f, μᵣ, εᵣ)
-    return te_reflection_fields(mode, x, y, c_e, c_h)
-end
-
-function tm_reflection_fields(mode::ReflectionMode, x, y, c_e, c_h)
-    mode.kind == :TM || throw(ArgumentError("mode kind must be :TM"))
-    ∂ψᵢ, ∂ψⱼ, ψₖ = modal_f(mode, x, y)
-    return tm_reflection_fields_from_modal(∂ψᵢ, ∂ψⱼ, ψₖ, c_e, c_h)
-end
-
-function tm_reflection_fields(mode::ReflectionMode, x, y, f, μᵣ, εᵣ)
-    k = kc(mode)
-    β = phase_constant(k, f, μᵣ, εᵣ)
-    c_e, c_h = tm_coefficients(k, β, f, μᵣ, εᵣ)
-    return tm_reflection_fields(mode, x, y, c_e, c_h)
-end
-
-function modal_f(mode::ReflectionMode{<:EquilateralTriangle}, x, y)
-    return equilateral_modal_f(x, y, mode.triangle, mode.m, mode.n, mode.kind, mode.symmetry)
-end
-
-function modal_f(mode::ReflectionMode{<:RightIsoscelesTriangle}, x, y)
-    return right_isosceles_modal_f(x, y, mode.triangle, mode.m, mode.n, mode.kind)
-end
-
-function modal_f(mode::ReflectionMode{<:HalfEquilateralTriangle}, x, y)
-    return half_equilateral_modal_f(x, y, mode.triangle, mode.m, mode.n, mode.kind)
-end
-
-function te_reflection_fields(mode::ReflectionMode, x::AbstractArray{T, N}, y::AbstractArray{T, N}, f, μᵣ, εᵣ) where {T, N}
-    k = kc(mode)
-    β = phase_constant(k, f, μᵣ, εᵣ)
-    c_e, c_h = te_coefficients(k, β, f, μᵣ, εᵣ)
-    fields = similar(x, NTuple{6, Complex{T}})
-    for idx in eachindex(x)
-        fields[idx] = te_reflection_fields(mode, x[idx], y[idx], c_e, c_h)
-    end
-    return fields
-end
-
-function tm_reflection_fields(mode::ReflectionMode, x::AbstractArray{T, N}, y::AbstractArray{T, N}, f, μᵣ, εᵣ) where {T, N}
-    k = kc(mode)
-    β = phase_constant(k, f, μᵣ, εᵣ)
-    c_e, c_h = tm_coefficients(k, β, f, μᵣ, εᵣ)
-    fields = similar(x, NTuple{6, Complex{T}})
-    for idx in eachindex(x)
-        fields[idx] = tm_reflection_fields(mode, x[idx], y[idx], c_e, c_h)
-    end
-    return fields
 end
 
 function array_fields(fieldfun::F, x::AbstractArray{T, N}, y::AbstractArray{T, N}, side, m, n, f, μᵣ, εᵣ) where {F, T, N}
