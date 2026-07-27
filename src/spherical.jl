@@ -555,12 +555,12 @@ function mn_vectors_sph(r, θ, ϕ, rs, ylm, ylm_p, k, μᵣ, εᵣ)
 
     ψ, ∂ψθ, ∂ψφ, ∂²ψᵣθ, ∂²ψᵣφ ,∂²ψᵣᵣ = sph_modal_f(θ, ϕ, rs, ylm, ylm_p, k)
  
-    mφ = ∂ψφ
-    mθ = -∂ψθ
-    mr = zero(mφ)
+    mr = zero(∂ψφ)
+    mθ = ∂ψφ
+    mφ = -∂ψθ
     nr = 1/k * ∂²ψᵣᵣ
-    nθ = 1/k * ∂²ψᵣφ
-    nφ = 1/k * ∂²ψᵣθ
+    nθ = 1/k * ∂²ψᵣθ
+    nφ = 1/k * ∂²ψᵣφ
 
     return (mr, mθ, mφ, nr, nθ, nφ)
 end
@@ -581,15 +581,14 @@ function te_from_mn_sph(r, θ, ϕ, rs, ylm, ylm_p, l, k, radial::Int, μᵣ, ε�
 
     Mᵣ, Mθ, Mϕ, Nᵣ, Nθ, Nϕ = mn_vectors_sph(r, θ, ϕ, rs, ylm, ylm_p, k, μᵣ, εᵣ)
 
-    # Match the same component convention already used by `te_sph_fields`.
     Eᵣ = zero(Mᵣ)
-    Eθ = -1/ε * Mϕ
-    Eϕ = -1/ε * Mθ
+    Eθ = -1/ε * Mθ
+    Eϕ = -1/ε * Mϕ
 
     sN = k / (im * ω * μ * ε)
     Hᵣ = sN * Nᵣ
-    Hθ = sN * Nϕ
-    Hϕ = sN * Nθ
+    Hθ = sN * Nθ
+    Hϕ = sN * Nϕ
 
     A = normalize ? te_normalization_sph(l, r, k, radial, μᵣ, εᵣ) : 1.0
     return (A * Eᵣ, A * Eθ, A * Eϕ, A * Hᵣ, A * Hθ, A * Hϕ)
@@ -613,12 +612,12 @@ function tm_from_mn_sph(r, θ, ϕ, rs, ylm, ylm_p, l, k, radial::Int, μᵣ, ε�
 
     sN = k / (im * ω * μ * ε)
     Eᵣ = sN * Nᵣ
-    Eθ = sN * Nϕ
-    Eϕ = sN * Nθ
+    Eθ = sN * Nθ
+    Eϕ = sN * Nϕ
 
     Hᵣ = zero(Mᵣ)
-    Hθ = 1/μ * Mϕ
-    Hϕ = 1/μ * Mθ
+    Hθ = 1/μ * Mθ
+    Hϕ = 1/μ * Mϕ
 
     A = normalize ? tm_normalization_sph(l, r, k, radial, μᵣ, εᵣ) : 1.0
     return (A * Eᵣ, A * Eθ, A * Eϕ, A * Hᵣ, A * Hθ, A * Hϕ)

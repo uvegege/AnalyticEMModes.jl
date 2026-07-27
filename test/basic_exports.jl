@@ -144,6 +144,46 @@ function numerical_mn_spheroidal_cartesian(mode, family, k, ξ, η, ϕ; even = t
     return M, N
 end
 
+function spherical_unit_vectors(θ, ϕ)
+    er = SVector(sin(θ) * cos(ϕ), sin(θ) * sin(ϕ), cos(θ))
+    eθ = SVector(cos(θ) * cos(ϕ), cos(θ) * sin(ϕ), -sin(θ))
+    eϕ = SVector(-sin(ϕ), cos(ϕ), 0.0)
+    return er, eθ, eϕ
+end
+
+function spherical_vector_potential(l, m, k, radial)
+    basis = AnalyticEMModes.SphericalHarmonics(l, normalisation = :sphericart)
+    idx = l^2 + l + m + 1
+    return (x, y, z) -> begin
+        r, _, _ = AnalyticEMModes.cart2sph(x, y, z)
+        ylm, _ = AnalyticEMModes.compute_with_gradients(basis, [SVector(x, y, z)])
+        R, _, _ = spherical_radial_with_derivatives(radial, l, r, k)
+        return R * ylm[1, idx] * SVector(x, y, z) / r
+    end
+end
+
+function mn_spherical_cartesian(l, m, k, radial, p, μr, εr)
+    r, θ, ϕ = AnalyticEMModes.cart2sph(p...)
+    basis = AnalyticEMModes.SphericalHarmonics(l, normalisation = :sphericart)
+    idx = l^2 + l + m + 1
+    ylm, ∇ylm = AnalyticEMModes.compute_with_gradients(basis, [p])
+    rs = spherical_radial_with_derivatives(radial, l, r, k)
+    mn = mn_vectors_sph(r, θ, ϕ, rs, ylm[1, idx], ∇ylm[1, idx], k, μr, εr)
+    er, eθ, eϕ = spherical_unit_vectors(θ, ϕ)
+
+    M = mn[1] * er + mn[2] * eθ + mn[3] * eϕ
+    N = mn[4] * er + mn[5] * eθ + mn[6] * eϕ
+    return M, N
+end
+
+function numerical_mn_spherical_cartesian(l, m, k, radial, p)
+    A = spherical_vector_potential(l, m, k, radial)
+    M = cartesian_curl_fd(A, p[1], p[2], p[3]; h = 1e-6)
+    Mfield = (x, y, z) -> cartesian_curl_fd(A, x, y, z; h = 1e-6)
+    N = cartesian_curl_fd(Mfield, p[1], p[2], p[3]; h = 2e-5) ./ k
+    return M, N
+end
+
 @testset "Basic exported API" begin
     f = 10e9
     μr, εr = 1.0, 1.0
@@ -222,6 +262,14 @@ end
         else
             @test d²R_k ≈ (dRp - dRm) / (2*h) + k^2 * R rtol=1e-6 atol=1e-6
         end
+    end
+
+    fd_point = SVector(0.03, 0.011, 0.027)
+    for radial in (1, 4), (ltest, mtest) in ((1, 0), (2, 1), (3, -2))
+        analyticM, analyticN = mn_spherical_cartesian(ltest, mtest, k, radial, fd_point, μr, εr)
+        numericM, numericN = numerical_mn_spherical_cartesian(ltest, mtest, k, radial, fd_point)
+        @test tuple_relerr(analyticM, numericM) < 1e-7
+        @test tuple_relerr(analyticN, numericN) < 5e-6
     end
 
     pts2 = [SVector(0.03, 0.011, 0.027), SVector(-0.018, 0.026, 0.041)]

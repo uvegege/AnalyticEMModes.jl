@@ -81,10 +81,9 @@ end
 Evaluate one spheroidal mode and return `(Mξ, Mη, Mϕ, Nξ, Nη, Nϕ)` in local spheroidal components.
 
 The returned vectors use the standard vector-wave scaling
-`M = ∇ × (ψ â)` and `N = (1/k) ∇ × M`.
-
-Vector components are returned in the natural coordinate basis `(eξ, eη, eϕ)`
-induced by `pro2cart`/`obl2cart`.
+`M = ∇ × (ψ â)` and `N = (1/k) ∇ × M`. The closed-form expressions used
+internally follow Li's Appendix A scaling; the public API rescales them by
+`M_standard = M_Li/2` and `N_standard = N_Li/4`.
 
 # Keyword arguments
 - `family`: vector family — `:x`, `:y`, `:z`, `:r`, `:+`, or `:-`. Default: `:z`.
@@ -158,7 +157,7 @@ function mn_spheroidal_vectors(points, basis::SpheroidalBasis{I, T}, k;
     npts = length(points)
     nmodes = length(basis.basis)
     A = Matrix{NTuple{6, Complex{T}}}(undef, npts, nmodes)
-    mn_spheroidal_vectors!(A, points, basis, k; family = family, even = even, oblate = oblate, radial = radial)
+    _mn_spheroidal_vectors!(A, points, basis, k; family = family, even = even, oblate = oblate, radial = radial)
     return A
 end
 
@@ -168,13 +167,14 @@ function mn_spheroidal_vectors(points::AbstractVector{<:SVector{3}}, basis::Sphe
     npts = length(points)
     nmodes = length(basis.basis)
     A = Matrix{NTuple{6, Complex{T}}}(undef, npts, nmodes)
-    mn_spheroidal_vectors!(A, points, basis, k; family = family, even = even, oblate = oblate, radial = radial)
+    _mn_spheroidal_vectors!(A, points, basis, k; family = family, even = even, oblate = oblate, radial = radial)
     return A
 end
 
-function mn_spheroidal_vectors!(A, points, basis::SpheroidalBasis{I, T}, k;
+function _mn_spheroidal_vectors!(A, points, basis::SpheroidalBasis{I, T}, k;
                                  family::Symbol = :z, even::Bool = true,
                                  oblate = nothing, radial::Int = 4) where {I, T}
+                                 
     sph_oblate = isnothing(oblate) ? (basis isa OblateSpheroidalBasis) : oblate
     sph_type = sph_oblate ? :oblate : :prolate
 
@@ -239,8 +239,7 @@ end
 Convenience overload accepting separate coordinate arrays `xi`, `eta`, `phi`.
 See `mn_spheroidal_vectors` for keyword arguments.
 """
-function mn_spheroidal_vectors(xi::AbstractArray, eta::AbstractArray, phi::AbstractArray,
-                               basis::SpheroidalBasis, k; kwargs...)
+function mn_spheroidal_vectors(xi::AbstractArray, eta::AbstractArray, phi::AbstractArray, basis::SpheroidalBasis, k; kwargs...)
     points = to_svector(xi, eta, phi)
     return mn_spheroidal_vectors(points, basis, k; kwargs...)
 end
@@ -254,10 +253,7 @@ evaluate all M/N vectors in one call. `c` is the spheroidal parameter.
 
 See `mn_spheroidal_vectors` for keyword arguments.
 """
-function mn_spheroidal_vectors_mnmax(points, m_max, n_max, c, k;
-                                     oblate::Bool = false, family::Symbol = :z,
-                                     even::Bool = true, radial::Int = 4)
-    basis = oblate ? OblateSpheroidalBasis(m_max, n_max, Complex(c)) :
-                     ProlateSpheroidalBasis(m_max, n_max, c)
+function mn_spheroidal_vectors_mnmax(points, m_max, n_max, c, k; oblate::Bool = false, family::Symbol = :z, even::Bool = true, radial::Int = 4)
+    basis = oblate ? OblateSpheroidalBasis(m_max, n_max, Complex(c)) : ProlateSpheroidalBasis(m_max, n_max, c)
     return mn_spheroidal_vectors(points, basis, k; family = family, even = even, oblate = oblate, radial = radial)
 end
