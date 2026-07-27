@@ -88,6 +88,8 @@ Detailed examples for each geometry are organized in the following sections:
 * **[Coaxial Waveguides](Cylindrical/Coaxial.md)**: Visualization of TE, TM, and TEM modes in coaxial structures
 * **[Radial and Wedge Waveguides](Cylindrical/Radial.md)**: Modes in radial waveguides and wedge structures
 * **[Elliptic Waveguides](Elliptic/elliptic.md)**: Modes using Mathieu functions
+* **[Elliptic Radial Gallery](Elliptic/elliptic_radial_gallery.md)**: Static gallery of elliptic radial TE/TM field components
+* **[Confocal Elliptic Coax Gallery](Elliptic/confocal_elliptic_coax_gallery.md)**: Static analytic/Gridap gallery for confocal elliptic coaxial modes
 * **[Rectangular Waveguides](Rectangular/rectangular.md)**: Analytical solutions in Cartesian coordinates
 * **[Spherical Modes](Spherical/spherical.md)**: Spherical vector waves and TE/TM utilities
 * **[Spheroidal Modes](Spheroidal/spheroidal.md)**: Prolate/oblate M-N vector families

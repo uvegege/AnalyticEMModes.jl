@@ -21,7 +21,11 @@ makedocs(modules = [AnalyticEMModes],
                 "Coaxial Waveguides" => "Cylindrical/Coaxial.md",
                 "Radial & Wedge" => "Cylindrical/Radial.md",
             ],
-            "Elliptic" => "Elliptic/elliptic.md",
+            "Elliptic" => Any[
+                "Elliptic Waveguides" => "Elliptic/elliptic.md",
+                "Elliptic Radial Gallery" => "Elliptic/elliptic_radial_gallery.md",
+                "Confocal Elliptic Coax Gallery" => "Elliptic/confocal_elliptic_coax_gallery.md",
+            ],
             "Spherical" => "Spherical/spherical.md",
             "Spheroidal" => "Spheroidal/spheroidal.md"
         ],
