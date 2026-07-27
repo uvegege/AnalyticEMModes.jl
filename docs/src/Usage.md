@@ -186,6 +186,8 @@ Eᵣ,Eθ,Eϕ,Hᵣ,Hθ,Hϕ = tm_from_mn_sph(r, θ, ϕ, rs, ylm, ylm_p, l, k, radi
 
 **Coordinates:** Local spheroidal `(ξ, η, ϕ)`, prolate/oblate.
 
+**Families:** `:x`, `:y`, `:z`, `:r`, `:+`, `:-`.
+
 **Core vector functions:**
 ```julia
 Mξ, Mη, Mϕ, Nξ, Nη, Nϕ = mn_spheroidal_vector(ξ, η, ϕ, mode, k; family=:z, even=true, radial=4)

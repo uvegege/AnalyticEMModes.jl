@@ -532,13 +532,13 @@ function tm_normalization_ewg(a, b, m::Int, even::Bool, kc, β, f, μᵣ, εᵣ;
 end
 
 # --- Simpson adaptativo (compacto) ---
-@inline function _simpson(f, a, b)
+@inline function simpson(f, a, b)
     c = (a + b)/2
     h = b - a
     return (h/6) * (f(a) + 4*f(c) + f(b))
 end
 
-function _adapt_simpson(f::F, a, b, fa, fb, fc, S, tol, depth) where F
+function adapt_simpson(f::F, a, b, fa, fb, fc, S, tol, depth) where F
     c  = (a + b)/2
     d  = (a + c)/2
     e  = (c + b)/2
@@ -550,8 +550,7 @@ function _adapt_simpson(f::F, a, b, fa, fb, fc, S, tol, depth) where F
     if depth <= 0 || abs(S2 - S) ≤ 15*tol
         return S2 + (S2 - S)/15
     end
-    return _adapt_simpson(f, a, c, fa, fc, fd, Sleft,  tol/2, depth-1) +
-           _adapt_simpson(f, c, b, fc, fb, fe, Sright, tol/2, depth-1)
+    return adapt_simpson(f, a, c, fa, fc, fd, Sleft,  tol/2, depth-1) + adapt_simpson(f, c, b, fc, fb, fe, Sright, tol/2, depth-1)
 end
 
 function quad_asimpson(f::F, a, b; rtol=1e-10, atol=0.0, maxdepth=20) where F
@@ -561,5 +560,5 @@ function quad_asimpson(f::F, a, b; rtol=1e-10, atol=0.0, maxdepth=20) where F
     fc = f(c)
     S = (b - a)/6 * (fa + 4*fc + fb)
     tol = max(atol, rtol*abs(S))
-    _adapt_simpson(f, a, b, fa, fb, fc, S, tol, maxdepth)
+    adapt_simpson(f, a, b, fa, fb, fc, S, tol, maxdepth)
 end

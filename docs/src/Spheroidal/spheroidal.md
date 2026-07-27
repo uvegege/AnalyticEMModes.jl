@@ -14,6 +14,8 @@ This section exposes the spheroidal vector-wave API currently available in `Anal
 
 - Coordinates are local spheroidal `(ξ, η, ϕ)` (prolate or oblate).
 - Base vectors are returned as `(Mξ, Mη, Mϕ, Nξ, Nη, Nϕ)`.
+- Available vector families are `:x`, `:y`, `:z`, `:r`, `:+`, and `:-`; `:+` and `:-` are the shifted `(m+1)` and `(m-1)` families.
+- The returned vectors use the standard vector-wave scaling `N = (1/k) curl(M)`. Book-scale constants are absorbed inside each `Mᵃ`/`Nᵃ` implementation.
 - The low-level `M/N` vectors are provided without enforcing TE/TM physical power normalization.
 - `kc_spheroidal()` is currently a placeholder and returns `0.0`.
 
@@ -61,7 +63,7 @@ For spheroidal geometry, the recommended current workflow is:
 2. Build the TE/TM convention at the field level (`E/H`) on top of those vectors.
 3. Normalize physically by flux/power on the chosen surface.
 
-This keeps the `curl(M) = kN` style relations explicit at the raw-basis level.
+This keeps the standard `curl(M) = kN` relation explicit at the raw-basis level.
 
 ## Visualization on Spheroidal Mesh
 

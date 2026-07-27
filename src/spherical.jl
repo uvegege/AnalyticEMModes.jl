@@ -182,13 +182,13 @@ function te_sph_fields_lmax(r_vec, lmax::Int, f, μᵣ, εᵣ, radial::Int = 4)
     basis = SphericalHarmonics(lmax, normalisation = :sphericart)
     A = Array{NTuple{6, ComplexF64}, 2}(undef, length(r_vec), (lmax+1)^2)
     Rs = Matrix{NTuple{3, ComplexF64}}(undef, length(r_vec), lmax+1)
-    _te_sph_fields_lmax!(A, Rs, r_vec, basis, lmax, f, μᵣ, εᵣ, radial)
+    te_sph_fields_lmax!(A, Rs, r_vec, basis, lmax, f, μᵣ, εᵣ, radial)
 
     return A
 end
 
 
-function _te_sph_fields_lmax!(A, Rs, r_vec, basis, lmax::Int, f, μᵣ, εᵣ, radial::Int)
+function te_sph_fields_lmax!(A, Rs, r_vec, basis, lmax::Int, f, μᵣ, εᵣ, radial::Int)
 
     sph_coords = map(x->cart2sph(x[1], x[2], x[3]),r_vec)
 
@@ -268,13 +268,13 @@ function tm_sph_fields_lmax(r_vec, lmax::Int, f, μᵣ, εᵣ, radial::Int = 4)
     basis = SphericalHarmonics(lmax, normalisation = :sphericart)
     A = Array{NTuple{6, ComplexF64}, 2}(undef, length(r_vec), (lmax+1)^2)
     Rs = Matrix{NTuple{3, ComplexF64}}(undef, length(r_vec), lmax+1)
-    _tm_sph_fields_lmax!(A, Rs, r_vec, basis, lmax, f, μᵣ, εᵣ, radial)
+    tm_sph_fields_lmax!(A, Rs, r_vec, basis, lmax, f, μᵣ, εᵣ, radial)
 
     return A
 end
 
 
-function _tm_sph_fields_lmax!(A, Rs, r_vec, basis, lmax::Int, f, μᵣ, εᵣ, radial::Int)
+function tm_sph_fields_lmax!(A, Rs, r_vec, basis, lmax::Int, f, μᵣ, εᵣ, radial::Int)
 
     sph_coords = map(x->cart2sph(x[1], x[2], x[3]),r_vec)
 
@@ -646,7 +646,7 @@ function mn_sph_vectors_lmax(r_vec, lmax::Int, f, μᵣ, εᵣ, radial::Int = 4)
     basis = SphericalHarmonics(lmax, normalisation = :sphericart)
     A = Array{NTuple{6, ComplexF64}, 2}(undef, length(r_vec), (lmax+1)^2)
     Rs = Matrix{NTuple{3, ComplexF64}}(undef, length(r_vec), lmax+1)
-    _mn_sph_vectors_lmax!(A, Rs, r_vec, basis, lmax, f, μᵣ, εᵣ, radial)
+    mn_sph_vectors_lmax!(A, Rs, r_vec, basis, lmax, f, μᵣ, εᵣ, radial)
 
     return A
 end
@@ -673,7 +673,7 @@ function n_sph_vectors_lmax(r_vec, lmax::Int, f, μᵣ, εᵣ, radial::Int = 4)
     return [(b[4], b[5], b[6]) for b in B]
 end
 
-function _mn_sph_vectors_lmax!(A, Rs, r_vec, basis, lmax::Int, f, μᵣ, εᵣ, radial::Int)
+function mn_sph_vectors_lmax!(A, Rs, r_vec, basis, lmax::Int, f, μᵣ, εᵣ, radial::Int)
 
     sph_coords = map(x->cart2sph(x[1], x[2], x[3]),r_vec)
     xi, yi, zi = r_vec[1]

@@ -32,19 +32,10 @@ pkg> add AnalyticEMModes
 | Radial         | `radial`| (ρ, φ, z)      | ✓                   |
 | Wedge          | `wedge` | (ρ, φ, z)      | ✓                   |
 | Elliptical       | `ewg` | (ξ, η)           | ✓                   |
+| Elliptic radial | `elliptic_radial` | (ξ, η, z) elliptic cylindrical | ✓ |
+| Confocal elliptic coaxial | `elliptic_coax` | (ξ, η) elliptic cylindrical annulus | ✓ |
 | Spherical      | `sph` | (r, θ, φ)      | ✓                   |
 | Spheroidal      | `spheroidal` | (ξ, η, ϕ) prolate/oblate | ✗ |
-
-## Spheroidal API (current scope)
-
-The spheroidal module currently exposes vector-wave building blocks:
-
-- `mn_spheroidal_vector`, `m_spheroidal_vector`, `n_spheroidal_vector`
-- `mn_spheroidal_vectors`, `m_spheroidal_vectors`, `n_spheroidal_vectors`
-- `mn_spheroidal_vectors_mnmax`
-- `ProlateSpheroidalBasis`, `OblateSpheroidalBasis`, `SpheroidalB`
-- coordinate helpers (`pro2cart`, `obl2cart`, `cart2pro`, `cart2obl`, scale factors)
-
 
 ## Examples
 

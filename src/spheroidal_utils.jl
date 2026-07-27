@@ -139,9 +139,7 @@ function oblate_partials(a, ξ, η, ϕ)
     eϕ_y =  R*cos(ϕ)
     eϕ_z =  0.0
 
-    return ex_x, ex_y, ex_z,
-           eη_x, eη_y, eη_z,
-           eϕ_x, eϕ_y, eϕ_z
+    return ex_x, ex_y, ex_z, eη_x, eη_y, eη_z, eϕ_x, eϕ_y, eϕ_z
 end
 
 """
@@ -208,19 +206,27 @@ function SpheroidalB(m, n, c)
     return SpheroidalB(m, n, c, λ, dr, c2k)
 end
 
+function SpheroidalB(m, n, c::Complex)
+    m > n && throw(ArgumentError("n must be >= m"))
+    spheroidal_c = im * c
+    λ = SpheroidalWaveFunctions.cv_matrix(m, n, spheroidal_c)
+    dr = SpheroidalWaveFunctions.compute_dr2_mix(m, n, spheroidal_c, λ)
+    c2k = SpheroidalWaveFunctions.compute_c2k(m, n, dr)
+    return SpheroidalB(m, n, c, λ, dr, c2k)
+end
 
 # Functions, partial derivative and second partial derivative
 function evaluate_angular(b::SpheroidalB{I, T, T}, η) where {I, T}
     (; m, n, c, λ, dr, c2k) = b
     S, ∂S = prolate_angular_ps(m, n, c, λ, c2k, η)
-    ∂²S = ((+2η*∂S - (λ - c^2*η^2 + m^2/(1 - η^2))*S) / (1 - η^2))
+    ∂²S = ((2*η*∂S - (λ - c^2*η^2 - m^2/(1 - η^2))*S) / (1 - η^2))
     return S, ∂S, ∂²S
 end
 
 function evaluate_angular(b::SpheroidalB{I, T, Complex{T}}, η) where {I, T}
     (; m, n, c, λ, dr, c2k) = b
     S, ∂S = oblate_angular_ps(m, n, c, λ, c2k, η)
-    ∂²S = ((+2η*∂S - (λ + c^2*η^2 - m^2/(1 - η^2))*S) / (1 - η^2))
+    ∂²S = ((2*η*∂S - (λ + c^2*η^2 - m^2/(1 - η^2))*S) / (1 - η^2))
     return S, ∂S, ∂²S
 end
 
@@ -235,6 +241,7 @@ function evaluate_radial1(b::SpheroidalB{I, T, Complex{T}}, ξ) where {I, T}
     (; m, n, c, λ, dr, c2k) = b
     R, ∂R = oblate_radial1(m, n, c, λ, dr, ξ)
     ξ = abs(ξ)
+    ∂R = ∂R - 2*m*R / (ξ * (ξ^2 + 1))
     ∂²R = ((-2ξ*∂R + (λ - c^2*ξ^2 - m^2/(ξ^2 + 1))*R) / (ξ^2 + 1))
     return R, ∂R, ∂²R
 end
@@ -250,6 +257,7 @@ function evaluate_radial2(b::SpheroidalB{I, T, Complex{T}}, ξ) where {I, T}
     (; m, n, c, λ, dr, c2k) = b
     R, ∂R = oblate_radial2(m, n, c, λ, dr, ξ)
     ξ = abs(ξ)
+    ∂R = ∂R - 2*m*R / (ξ * (ξ^2 + 1))
     ∂²R = ((-2ξ*∂R + (λ - c^2*ξ^2 - m^2/(ξ^2 + 1))*R) / (ξ^2 + 1))
     return R, ∂R, ∂²R
 end
@@ -265,12 +273,8 @@ function evaluate_radial3(b::SpheroidalB{I, T, T}, ξ) where {I, T}
 end
 
 function evaluate_radial3(b::SpheroidalB{I, T, Complex{T}}, ξ) where {I, T}
-    (; m, n, c, λ, dr, c2k) = b
-    R, ∂R = oblate_radial1(m, n, c, λ, dr, ξ)
-    R2, ∂R2 = oblate_radial2(m, n, c, λ, dr, ξ)
-    ξ = abs(ξ)
-    ∂²R = ((-2ξ*∂R + (λ - c^2*ξ^2 - m^2/(ξ^2 + 1))*R) / (ξ^2 + 1))
-    ∂²R2 = ((-2ξ*∂R2 + (λ - c^2*ξ^2 - m^2/(ξ^2 + 1))*R2) / (ξ^2 + 1))
+    R, ∂R, ∂²R = evaluate_radial1(b, ξ)
+    R2, ∂R2, ∂²R2 = evaluate_radial2(b, ξ)
     return R + im * R2, ∂R + im * ∂R2, ∂²R + im * ∂²R2
 end
 
@@ -285,12 +289,8 @@ function evaluate_radial4(b::SpheroidalB{I, T, T}, ξ) where {I, T}
 end
 
 function evaluate_radial4(b::SpheroidalB{I, T, Complex{T}}, ξ) where {I, T}
-    (; m, n, c, λ, dr, c2k) = b
-    R, ∂R = oblate_radial1(m, n, c, λ, dr, ξ)
-    R2, ∂R2 = oblate_radial2(m, n, c, λ, dr, ξ)
-    ξ = abs(ξ)
-    ∂²R = ((-2ξ*∂R + (λ - c^2*ξ^2 - m^2/(ξ^2 + 1))*R) / (ξ^2 + 1))
-    ∂²R2 = ((-2ξ*∂R2 + (λ - c^2*ξ^2 - m^2/(ξ^2 + 1))*R2) / (ξ^2 + 1))
+    R, ∂R, ∂²R = evaluate_radial1(b, ξ)
+    R2, ∂R2, ∂²R2 = evaluate_radial2(b, ξ)
     return R - im * R2, ∂R - im * ∂R2, ∂²R - im * ∂²R2
 end
 

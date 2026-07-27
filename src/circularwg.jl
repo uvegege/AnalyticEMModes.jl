@@ -20,23 +20,23 @@ kc_tm_cwg(r, m, n) = _xmn[m+1, n] / r
 
 # https://dlmf.nist.gov/10.21#vi
 """
-    _jvm(a, μ)
+    jvm(a, μ)
 
 McMahon's Asymptotic Expansions for Large Zero of Bessel function
 
 Reference: # https://dlmf.nist.gov/10.21#vi
 """
-_jvm(a, μ) = a - (μ - 1)/(8*a) - (4*μ - 1)*(7*μ - 31)/(3*(8*a)^3) - (32*(μ-1)*(83*μ^2-982*μ+3779))/(15*(8*a)^5) - 64*(μ - 1)*(6949*μ^3 - 153855*μ^2 + 1585743*μ - 6277237)/(105*(8*a)^7)
+jvm(a, μ) = a - (μ - 1)/(8*a) - (4*μ - 1)*(7*μ - 31)/(3*(8*a)^3) - (32*(μ-1)*(83*μ^2-982*μ+3779))/(15*(8*a)^5) - 64*(μ - 1)*(6949*μ^3 - 153855*μ^2 + 1585743*μ - 6277237)/(105*(8*a)^7)
 
 """
-    _jvm(a, μ)
+    jvm(a, μ)
     
 McMahon's Asymptotic Expansions for Large Zero of Bessel function first derivative.
 
 Reference: # https://dlmf.nist.gov/10.21#vi
 
 """
-_j1vm(b, μ) = b - (μ + 3)/(8*b) - 4*(7*μ^2 + 82*μ - 9)/(3*(8*b)^3) - (32*(83*μ^3 + 2075*μ^2 - 3039*μ + 3537))/(15*(8*b)^5) - 64*(6949*μ^4 + 296492*μ^3 - 1248002*μ^2 + 7414380*μ - 5853627)/(105*(8*b)^7)
+j1vm(b, μ) = b - (μ + 3)/(8*b) - 4*(7*μ^2 + 82*μ - 9)/(3*(8*b)^3) - (32*(83*μ^3 + 2075*μ^2 - 3039*μ + 3537))/(15*(8*b)^5) - 64*(6949*μ^4 + 296492*μ^3 - 1248002*μ^2 + 7414380*μ - 5853627)/(105*(8*b)^7)
 
 
 """
@@ -49,7 +49,7 @@ Reference: # https://dlmf.nist.gov/10.21#vi
 function asymtotic_zero_tm(m, n)
     a = π * (n + m/2 - 1/4)
     μ = 4*m^2
-    return _jvm(a, μ)
+    return jvm(a, μ)
 end
 
 
@@ -63,7 +63,7 @@ Reference: # https://dlmf.nist.gov/10.21#vi
 function asymtotic_zero_te(m, n)
     b = π * (n + m/2 - 3/4)
     μ = 4*m^2
-    return _j1vm(b, μ)
+    return j1vm(b, μ)
 end
 
 
